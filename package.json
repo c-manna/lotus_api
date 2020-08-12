@@ -25,6 +25,8 @@
     "pm2": "^4.4.0",
     "request": "^2.88.2",
     "request-promise": "^4.2.5",
-    "serve-favicon": "^2.5.0"
+    "serve-favicon": "^2.5.0",
+    "socket.io": "^2.3.0",
+    "validatorjs": "^3.18.1"
   }
 }

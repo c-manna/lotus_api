@@ -2,6 +2,8 @@ const util = require('util');
 var db = require('../dbconnection');
 const query = util.promisify(db.query).bind(db);
 
+const validator = require("../middleware/validator");
+// http://172.105.38.170:8000/fetch-market-odds?eventID=4&competitionId=11365612&marketID=1.171958107
 module.exports = {
 
  placeBet: async (req, res, next) => {
@@ -16,7 +18,7 @@ module.exports = {
     success: true,
     message: "Bet placed success",
     data: result
-   })
+   });
   } catch (err) {
    console.log(err)
    return res.send({

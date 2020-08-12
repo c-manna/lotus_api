@@ -9,6 +9,7 @@ var fileUpload = require('express-fileupload');
 var fs = require('fs');
 
 var routes = require('./routes/index');
+var socketService = require("./services/socketService");
 
 
 
