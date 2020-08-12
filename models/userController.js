@@ -238,6 +238,8 @@ var userController = {
 
 
 	},
+
+	
 	getEventCompetition: async function (userparams, callback) {
 
 
