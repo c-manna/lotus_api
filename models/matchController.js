@@ -4,7 +4,7 @@ const query = util.promisify(db.query).bind(db);
 
 const bcrypt = require('bcrypt');
 
-const validator = require("../middleware/validator");
+//const validator = require("../middleware/validator");
 // http://172.105.38.170:8000/fetch-market-odds?eventID=4&competitionId=11365612&marketID=1.171958107
 module.exports = {
 
