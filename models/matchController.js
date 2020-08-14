@@ -94,6 +94,51 @@ module.exports = {
     err: err
    });
   }
+ },
+
+ openBet: async (req, res, next) => {
+  const userId = "8349711Z001";
+  try {
+   let dataList = await query("SELECT * FROM single_bet_info WHERE market_status =? AND user_id =?", [0, userId]);
+   return res.send({
+    success: true,
+    data: dataList
+   });
+  } catch (err) {
+   console.log(err)
+   return res.send({
+    success: false,
+    message: "something went wrong",
+    err: err
+   });
+  }
+ },
+
+ profitLossBet: async (req, res, next) => {
+  const userId = "8349711Z001";
+  try {
+   let sqlQuery = "SELECT DATE(bet_time),JSON_ARRAY(GROUP_CONCAT(JSON_OBJECT('bet_time',bet_time))) as groupData from single_bet_info group by DATE(single_bet_info.bet_time)"
+
+
+
+   // let sqlQuery = "SELECT market_id,GROUP_CONCAT (CONCAT('{name:', bet_time ,'}')) as groupData from single_bet_info group by market_id"
+   // let sqlQuery = "SELECT market_id,CONCAT('[',GROUP_CONCAT(JSON_OBJECT('bet_time',bet_time)),']') as groupData from single_bet_info group by market_id"
+   // let sqlQuery = "SELECT * FROM ( SELECT * FROM single_bet_info GROUP BY date(bet_time) ) AS sub ORDER BY bet_time ASC ";
+   // let sqlQuery = "SELECT DATE(bet_time), market_id, market_type FROM single_bet_info GROUP BY DATE(single_bet_info.bet_time), market_id, market_type;"
+   // let dataList = await query("SELECT * FROM single_bet_info WHERE market_status =? AND user_id =?", [0, userId]);
+   let dataList = await query(sqlQuery);
+   return res.send({
+    success: true,
+    data: dataList
+   });
+  } catch (err) {
+   console.log(err)
+   return res.send({
+    success: false,
+    message: "something went wrong",
+    err: err
+   });
+  }
  }
 
 };

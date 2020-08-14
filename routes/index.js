@@ -125,6 +125,8 @@ router.get('/fetch-inplay', function (req, res) {
 router.get("/setting", matchController.getSetting);
 router.post("/update-setting", matchController.updateSetting);
 router.post("/update-password", matchController.updatePassword);
+router.get("/open-bet", matchController.openBet);
+router.get("/profit-loss-bet", matchController.profitLossBet);
 
 
 
