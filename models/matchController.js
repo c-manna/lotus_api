@@ -117,7 +117,7 @@ module.exports = {
  profitLossBet: async (req, res, next) => {
   const userId = "8349711Z001";
   try {
-   let sqlQuery = "SELECT DATE(bet_time),JSON_ARRAY(GROUP_CONCAT(JSON_OBJECT('bet_time',bet_time))) as groupData from single_bet_info group by DATE(single_bet_info.bet_time)"
+   //let sqlQuery = "SELECT bet_time, JSON_OBJECT('bet_id',bet_id,'amount',amount) as value from single_bet_info group by DATE(single_bet_info.bet_time) HAVING user_id = '8349711Z001'";
 
 
 
@@ -126,6 +126,7 @@ module.exports = {
    // let sqlQuery = "SELECT * FROM ( SELECT * FROM single_bet_info GROUP BY date(bet_time) ) AS sub ORDER BY bet_time ASC ";
    // let sqlQuery = "SELECT DATE(bet_time), market_id, market_type FROM single_bet_info GROUP BY DATE(single_bet_info.bet_time), market_id, market_type;"
    // let dataList = await query("SELECT * FROM single_bet_info WHERE market_status =? AND user_id =?", [0, userId]);
+   let sqlQuery ="SELECT * from single_bet_info group by DATE(single_bet_info.bet_time)"
    let dataList = await query(sqlQuery);
    return res.send({
     success: true,
