@@ -4,6 +4,7 @@ const query = util.promisify(db.query).bind(db);
 
 const bcrypt = require('bcrypt');
 const _ = require('lodash');
+const moment = require("moment");
 
 //const validator = require("../middleware/validator");
 // http://172.105.38.170:8000/fetch-market-odds?eventID=4&competitionId=11365612&marketID=1.171958107
@@ -120,10 +121,10 @@ module.exports = {
   let startDate = new Date(new Date().setDate(new Date().getDate() - 7))
   let endDate = new Date();
   if (req.query.startDate && req.query.endDate) {
-   startDate = new Date(req.query.startDate);
-   endDate = new Date(req.query.endDate);
+   startDate = new Date(parseInt(req.query.startDate));
+   endDate = new Date(parseInt(req.query.endDate));
   }
-  console.log(startDate, endDate);
+  // console.log(startDate, endDate, req.query.startDate, req.query.endDate);
   try {
    let sqlQuery = "SELECT * FROM single_bet_info WHERE settled_time BETWEEN ? AND ? AND market_status = ? AND user_id= ?";
    let dataList = await query(sqlQuery, [startDate, endDate, 1, userId]); //params need to be changed
@@ -176,7 +177,7 @@ module.exports = {
  getUserCommision: async (req, res, next) => {
   const userId = req.decoded.punter_id;
   try {
-   let dataList = await query("SELECT punter_commission FROM punter WHERE punter_id =?", [userId]);
+   let dataList = await query("SELECT punter_commission, punter_balance, punter_balance_type FROM punter WHERE punter_id =?", [userId]);
    return res.send({
     success: true,
     data: dataList[0]
@@ -192,14 +193,48 @@ module.exports = {
  },
 
  transferStatment: async (req, res, next) => {
-  const userId = req.decoded.punter_id;
-  // const userId = req.decoded.punter_id;
-  // const sqlQuery = "SELECT single_bet_info.market_id, transfer_statement.amount FROM single_bet_info JOIN transfer_statement ON single_bet_info.user_id = transfer_statement.punter_id"
+  const page = parseInt(!isNaN(req.query.page) ? req.query.page : 1),
+   limit = parseInt(!isNaN(req.query.limit) ? req.query.limit : 25),
+   userId = req.decoded.punter_id;
+  let startDate = new Date("01/01/2020")
+  let endDate = new Date();
+  if (req.query.startDate && req.query.endDate) {
+   startDate = new Date(parseInt(req.query.startDate));
+   endDate = new Date(parseInt(req.query.endDate));
+  }
+  let balanceStatement = [], transferStatement = [], betStatement = [];
+  let query1 = "SELECT amount, (bs_date) AS date, bs_id, master_id, punter_id, type, user_type FROM balance_statement WHERE punter_id =? AND bs_date BETWEEN ? AND ? ";
+  let query2 = "SELECT amount, master_id, p_and_l, payment_given_to, payment_receive_from, punter_id, remarks, (transfer_date) AS date, transfer_time, ts_id FROM transfer_statement WHERE punter_id =? AND transfer_date BETWEEN ? AND ? ";
+  let query3 = "SELECT single_bet_id, market_id, match_id, selection_id, market_status, market_type, market_start_time, market_end_time, description, event_name, bet_time, user_id, bet_id, bet_status, exposure, runner_name, stake, odd, placed_odd, last_odd, profit_team_data, loss_team_data, p_and_l, amount, available_balance, protential_profit, user_ip, (settled_time) AS date FROM single_bet_info WHERE user_id =? AND market_status=? AND settled_time BETWEEN ? AND ?";
+  console.log(req.body.filter);
   try {
-   let dataList = await query("SELECT single_bet_info.market_type,transfer_statement.amount FROM  single_bet_info JOIN transfer_statement ON single_bet_info.user_id = transfer_statement.punter_id ", ["2750231N005"]);
+   if (req.body.filter) {
+    if (req.body.filter.balance_statement && req.body.filter.type) {
+     query1 = "SELECT amount, (bs_date) AS date, bs_id, master_id, punter_id, type, user_type FROM balance_statement WHERE punter_id =? AND bs_date BETWEEN ? AND ? AND type= ?";
+     balanceStatement = await query(query1, [userId, startDate, endDate, req.body.filter.type]);
+    } else if (req.body.filter.transfer_statement) {
+     query2 = "SELECT amount, master_id, p_and_l, payment_given_to, payment_receive_from, punter_id, remarks, (transfer_date) AS date, transfer_time, ts_id FROM transfer_statement WHERE punter_id =? AND transfer_date BETWEEN ? AND ? AND p_and_l =?";
+     transferStatement = await query(query2, [userId, startDate, endDate, req.body.filter.p_and_l]);
+    } else if (req.body.filter.balance_statement && req.body.filter.transfer_statement) {
+     query1 = "SELECT amount, (bs_date) AS date, bs_id, master_id, punter_id, type, user_type FROM balance_statement WHERE punter_id =? AND bs_date BETWEEN ? AND ? AND user_type =?";
+     query2 = "SELECT amount, master_id, p_and_l, payment_given_to, payment_receive_from, punter_id, remarks, (transfer_date) AS date, transfer_time, ts_id FROM transfer_statement WHERE punter_id =? AND transfer_date BETWEEN ? AND ? AND user_type= ?";
+     balanceStatement = await query(query1, [userId, startDate, endDate, req.body.filter.user_type]);
+     // transferStatement = await query(query2, [userId, startDate, endDate, req.body.filter.user_type]);
+    } else if (req.body.filter.single_bet_info) {
+     betStatement = await query(query3, [userId, 1, startDate, endDate]);
+    }
+   } else {
+    balanceStatement = await query(query1, [userId, startDate, endDate]);
+    transferStatement = await query(query2, [userId, startDate, endDate]);
+    betStatement = await query(query3, [userId, 1, startDate, endDate]);
+   }
+   const dataList = [...balanceStatement, ...transferStatement, ...betStatement];
+   const count = dataList.length;
+   const sortData = _.sortBy(dataList, function (o) { return new moment(o.date); }).reverse();
    return res.send({
     success: true,
-    data: dataList
+    data: sortData.splice((page - 1) * limit, limit),
+    count: count
    });
   } catch (err) {
    console.log(err)

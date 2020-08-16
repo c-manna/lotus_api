@@ -120,6 +120,24 @@ router.get('/fetch-inplay', function (req, res) {
 	})
 
 })
+router.post("/single-place-bet", function (req, res) {
+
+	userModel.singlePlaceInfo(req.body, function (response) {
+		res.json(response);
+	})
+})
+
+router.post('/getexposure', function (req, res) {
+	userModel.getExposure(req.body, function (response) {
+		res.json(response);
+	})
+})
+
+router.post('/getbalanceDetails', AuthMiddleware.checkToken, function (req, res) {
+	userModel.getbalanceDetails(req.body, function (response) {
+		res.json(response);
+	})
+})
 
 router.get("/setting", AuthMiddleware.checkToken, matchController.getSetting);
 router.post("/update-setting", AuthMiddleware.checkToken, matchController.updateSetting);
@@ -127,8 +145,8 @@ router.post("/update-password", AuthMiddleware.checkToken, matchController.updat
 router.get("/open-bet", AuthMiddleware.checkToken, matchController.openBet);
 router.get("/profit-loss-bet", AuthMiddleware.checkToken, matchController.profitLossBet);
 router.get("/profit-loss-details/:marketId", AuthMiddleware.checkToken, matchController.profitLossDetails);
-router.get("/user-commision", AuthMiddleware.checkToken, matchController.getUserCommision);
-router.get("/transfer-statment", AuthMiddleware.checkToken, matchController.transferStatment);
+router.get("/user-details", AuthMiddleware.checkToken, matchController.getUserCommision);
+router.post("/transfer-statment", AuthMiddleware.checkToken, matchController.transferStatment);
 
 
 
