@@ -33,7 +33,7 @@ module.exports = {
  },
 
  getSetting: async (req, res, next) => {
-  const userId = "2750231N007";
+  const userId = req.decoded.punter_id;
   try {
    const setting = await query("SELECT * from settings where user_id =?", [userId]);
    return res.send({
@@ -52,7 +52,7 @@ module.exports = {
  },
 
  updateSetting: async (req, res, next) => {
-  const userId = "2750231N007";
+  const userId = req.decoded.punter_id;
   try {
    const setting = await query('UPDATE settings SET ? WHERE ?', [req.body, { user_id: userId }]);
    return res.send({
@@ -70,7 +70,7 @@ module.exports = {
  },
 
  updatePassword: async (req, res, next) => {
-  const userId = "2750231N007";
+  const userId = req.decoded.punter_id;
   if (!req.body.password) return next("Old password is required");
   if (!req.body.newPassword) return next("New password is required");
   try {
@@ -98,7 +98,7 @@ module.exports = {
  },
 
  openBet: async (req, res, next) => {
-  const userId = "8349711Z001";
+  const userId = req.decoded.punter_id;
   try {
    let dataList = await query("SELECT * FROM single_bet_info WHERE market_status =? AND user_id =?", [0, userId]);
    return res.send({
@@ -116,7 +116,7 @@ module.exports = {
  },
 
  profitLossBet: async (req, res, next) => {
-  const userId = "8349711Z001";
+  const userId = req.decoded.punter_id;
   let startDate = new Date(new Date().setDate(new Date().getDate() - 7))
   let endDate = new Date();
   if (req.query.startDate && req.query.endDate) {
@@ -155,7 +155,7 @@ module.exports = {
 
 
  profitLossDetails: async (req, res, next) => {
-  const userId = "8349711Z001";
+  const userId = req.decoded.punter_id;
   const marketId = req.params.marketId;
   try {
    let dataList = await query("SELECT * FROM single_bet_info WHERE market_status =? AND user_id =? AND market_id =?", [1, userId, marketId]);
@@ -189,6 +189,33 @@ module.exports = {
     err: err
    });
   }
+ },
+
+ transferStatment: async (req, res, next) => {
+  const userId = req.decoded.punter_id;
+  // const userId = req.decoded.punter_id;
+  // const sqlQuery = "SELECT single_bet_info.market_id, transfer_statement.amount FROM single_bet_info JOIN transfer_statement ON single_bet_info.user_id = transfer_statement.punter_id"
+  try {
+   let dataList = await query("SELECT single_bet_info.market_type,transfer_statement.amount FROM  single_bet_info JOIN transfer_statement ON single_bet_info.user_id = transfer_statement.punter_id ", ["2750231N005"]);
+   return res.send({
+    success: true,
+    data: dataList
+   });
+  } catch (err) {
+   console.log(err)
+   return res.send({
+    success: false,
+    message: "something went wrong",
+    err: err
+   });
+  }
+
+  // var sql = db.query("SELECT single_bet_info.market_id , transfer_statement.amount FROM single_bet_info JOIN transfer_statement ON single_bet_info.user_id = transfer_statement.punter_id", ['2750231N005'], function (err, rows, fields) {
+  //  if (!err) {
+  //   console.log(err);
+  //  }
+  //  console.log(rows)
+  // });
  }
 
 };

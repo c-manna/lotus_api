@@ -121,13 +121,14 @@ router.get('/fetch-inplay', function (req, res) {
 
 })
 
-router.get("/setting", matchController.getSetting);
-router.post("/update-setting", matchController.updateSetting);
-router.post("/update-password", matchController.updatePassword);
-router.get("/open-bet", matchController.openBet);
-router.get("/profit-loss-bet", matchController.profitLossBet);
-router.get("/profit-loss-details/:marketId", matchController.profitLossDetails);
+router.get("/setting", AuthMiddleware.checkToken, matchController.getSetting);
+router.post("/update-setting", AuthMiddleware.checkToken, matchController.updateSetting);
+router.post("/update-password", AuthMiddleware.checkToken, matchController.updatePassword);
+router.get("/open-bet", AuthMiddleware.checkToken, matchController.openBet);
+router.get("/profit-loss-bet", AuthMiddleware.checkToken, matchController.profitLossBet);
+router.get("/profit-loss-details/:marketId", AuthMiddleware.checkToken, matchController.profitLossDetails);
 router.get("/user-commision", AuthMiddleware.checkToken, matchController.getUserCommision);
+router.get("/transfer-statment", AuthMiddleware.checkToken, matchController.transferStatment);
 
 
 
