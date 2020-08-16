@@ -1225,4 +1225,5 @@ var userController = {
 }
 
 
+>>>>>>> 1f353cb3a7341c63c365032450346f1251a08849
 module.exports = userController;
