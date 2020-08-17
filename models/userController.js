@@ -249,7 +249,8 @@ var userController = {
             });
             const payload = {
                 punter_id: user.punter_id,
-                punter_user_name: user.punter_user_name
+                punter_user_name: user.punter_user_name,
+                punter_belongs_to: user.punter_belongs_to
             }
             const token = await util.promisify(jwt.sign)(payload, config.JWT.JWT_USER_SECRET, {
                 expiresIn: "120 days"
@@ -954,54 +955,34 @@ var userController = {
             // if(available_balance>=calculate_exposure || exposure_limit_balance>=calculate_exposure){
 
 
-            var profitTeamdetailsArr = [];
-            var lossTeamdetailsArr = [];
+            var all_teams_exposure_data = [];
             for (var i = 0; i <= betInfo.runners.length - 1; i++) {
-                if (odd == 'back') {
-                    if (betInfo.runners[i].runnerName == bet_team) {
+/*                 if (odd == 'back') { */
+                    if (betInfo.runners[i].runnerName == bet_team) { 
                         //console.log('bet back team name profit',betInfo.runners[i].runnerName+'='+profit);
                         var selectionID = betInfo.runners[i].selectionId;
                         var team_details = {
-                            odd_type: odd,
+                            odd_type: betInfo.odd,
                             team_name: betInfo.runners[i].runnerName,
-                            profit_amt: profit.toFixed(2)
+                            amount: betInfo.odd==0? Math.abs(profit.toFixed(2)) : -Math.abs(loss.toFixed(2))
                         }
-                        profitTeamdetailsArr.push(team_details);
-                    } else {
+                        all_teams_exposure_data.push(team_details);
+                     } else {
                         //console.log('others back team name loss',betInfo.runners[i].runnerName+'='+loss);
                         var team_details = {
-                            odd_type: 'lay',
+                            odd_type: betInfo.odd==0?1:betInfo.odd,
                             team_name: betInfo.runners[i].runnerName,
-                            loss_amt: loss.toFixed(2)
+                            amount: betInfo.odd==0? -Math.abs(loss.toFixed(2)) : Math.abs(profit.toFixed(2))
                         }
-                        lossTeamdetailsArr.push(team_details);
+                        all_teams_exposure_data.push(team_details);
                     }
-                } else {
-                    if (betInfo.runners[i].runnerName == bet_team) {
-                        //console.log('bet lay team name profit',betInfo.runners[i].runnerName+'='+loss);
-                        var selectionID = betInfo.runners[i].selectionId;
-                        var team_details = {
-                            odd_type: odd,
-                            team_name: betInfo.runners[i].runnerName,
-                            loss_amt: loss.toFixed(2)
-                        }
-                        lossTeamdetailsArr.push(team_details);
-                    } else {
-                        //console.log('others lay team name loss',betInfo.runners[i].runnerName+'='+profit);
-                        var team_details = {
-                            odd_type: 'back',
-                            team_name: betInfo.runners[i].runnerName,
-                            profit_amt: profit.toFixed(2)
-                        }
-                        profitTeamdetailsArr.push(team_details);
-                    }
-                }
+               /* } */
 
             }
             let sql = `INSERT INTO single_bet_info 
-			   (market_id,market_status, market_type,match_id,selection_id, market_start_time, market_end_time, description, event_name, bet_time, user_id, bet_id, bet_status,exposure,runner_name,stake,odd,placed_odd,last_odd,p_and_l,amount, available_balance, protential_profit,user_ip,settled_time,profit_team_data,loss_team_data)
+			   (market_id,market_status, market_type,match_id,selection_id, market_start_time, market_end_time, description, event_name, bet_time, user_id, bet_id, bet_status,exposure,runner_name,stake,odd,placed_odd,last_odd,p_and_l,amount, available_balance, protential_profit,user_ip,settled_time,all_teams_exposure_data,master_id)
 			    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
-            var bet_insert = db.query(sql, [betInfo.market_id, betInfo.market_status, betInfo.market_type, betInfo.match_id, selectionID, betInfo.market_start_time, betInfo.market_end_time, betInfo.description, betInfo.event_name, betInfo.bet_time, betInfo.user_id, betInfo.bet_id, betInfo.bet_status, net_exposure, betInfo.runner_name, betInfo.stake, betInfo.odd, betInfo.place_odd, betInfo.last_odd, betInfo.p_and_l, exposure_amt, remain_balance, profit, betInfo.user_ip, betInfo.settled_time, JSON.stringify(profitTeamdetailsArr), JSON.stringify(lossTeamdetailsArr)], function(err, rows, fields) {
+            var bet_insert = db.query(sql, [betInfo.market_id, betInfo.market_status, betInfo.market_type, betInfo.match_id, selectionID, betInfo.market_start_time, betInfo.market_end_time, betInfo.description, betInfo.event_name, betInfo.bet_time, betInfo.user_id, betInfo.bet_id, betInfo.bet_status, net_exposure, betInfo.runner_name, betInfo.stake, betInfo.odd, betInfo.place_odd, betInfo.last_odd, betInfo.p_and_l, exposure_amt, remain_balance, profit, betInfo.user_ip, betInfo.settled_time, JSON.stringify(all_teams_exposure_data),betInfo.master_id], function(err, rows, fields) {
                 // console.log('query',bet_insert.sql);
                 if (!err) {
                     //var update_avl_amt=await update_balance(betInfo.user_id,remain_balance);
@@ -1020,8 +1001,7 @@ var userController = {
                                 balance_limit: exposure_limit_balance.toFixed(2),
                                 max_market: max_market,
                                 max_bet: max_bet,
-                                profit_data: profitTeamdetailsArr,
-                                loss_data: lossTeamdetailsArr
+                                all_teams_exposure_data: all_teams_exposure_data
 
                             }
                             callback({
@@ -1106,8 +1086,7 @@ var userController = {
                                     market_id: rows[i].market_id,
                                     market_status: rows[i].market_status,
                                     bet_status: rows[i].bet_status,
-                                    profit_team_data: JSON.parse(rows[i].profit_team_data.replace(/(\r\n|\n|\r)/gm, "")),
-                                    loss_team_data: JSON.parse(rows[i].loss_team_data.replace(/(\r\n|\n|\r)/gm, "")),
+                                    all_teams_exposure_data: JSON.parse(rows[i].all_teams_exposure_data.replace(/(\r\n|\n|\r)/gm, ""))
                                 }
                                 exposureArr.push(responseObject);
                             }
