@@ -793,28 +793,28 @@ var userController = {
         var inPlay = [];
         var allEventCompetition = await event_competition(userparams.eventID);
         var eventCompetitionData = JSON.parse(allEventCompetition);
-        //console.log('eventElement==>',event_response[i].eventType);
-        //console.log('allEventCompetition',eventCompetitionData);
-        //[{"event":{"id":"29956047","name":"FC Minaj v Volyn","countryCode":"UA","timezone":"GMT","openDate":"2020-08-13T14:30:00.000Z"},"marketCount":25,"scoreboard_id":"","selections":null,"liability_type":"0","undeclared_markets":3}]
+       
         if (eventCompetitionData.length > 0) {
             for (var j = 0; j <= eventCompetitionData.length - 1; j++) {
                 var competitionId = eventCompetitionData[j].competition.id;
-                //console.log('event competition id==>',competitionId);
+                var competitionName = eventCompetitionData[j].competition.name;
+                
                 var matchByCompetetion = await matchby_Competetion(userparams.eventID, competitionId);
                 var matchCompetitionData = JSON.parse(matchByCompetetion);
-                //console.log('matchByCompetetion==>',matchCompetitionData);
+                // console.log('matchByCompetetion==>',matchCompetitionData);
                 if (matchCompetitionData.length > 0) {
                     for (var i = 0; i <= matchCompetitionData.length - 1; i++) {
 
                         //inPlay.push(matchCompetitionData[i].event);
                         let matcheventID = matchCompetitionData[i].event.id;
+                        var matchName=matchCompetitionData[i].event.name;
                         var fetchmarketMatch = await market_match(matcheventID);
                         let fetchmarketMatchData = JSON.parse(fetchmarketMatch);
                         //console.log('fetchmarketMatch==>',fetchmarketMatchData);
                         if (fetchmarketMatchData.length > 0) {
                             for (var k = 0; k <= fetchmarketMatchData.length - 1; k++) {
                                 //console.log('market ID==>',fetchmarketMatchData[k].marketId);
-                                let marketID = fetchmarketMatchData[k].marketId
+                                let marketID = fetchmarketMatchData[k].marketId;
                                 var market_bookODD = await book_odd(marketID);
                                 let bookodd_data = JSON.parse(market_bookODD);
                                 // console.log('market_bookODD data==>',bookodd_data);
@@ -822,10 +822,18 @@ var userController = {
                                     for (var m = 0; m <= bookodd_data.length - 1; m++) {
                                         //console.log('market_bookODD inplay data==>',bookodd_data[m].inplay);
                                         if (bookodd_data[m].inplay == true) {
-                                            console.log('matchByCompetetion ID==>', matchCompetitionData[i].event.name);
-                                            inPlay['event_name'] = matchCompetitionData[i].event.name;
-                                            console.log('market_bookODD inplay data==>', bookodd_data[m].inplay);
-                                            inPlay.push(bookodd_data[m])
+                                            
+                                            var responseObject={
+                                                event_name:competitionName,
+                                                competetion_id:competitionId,
+                                                match_id:matcheventID,
+                                                match_name:matchName,
+                                                inPlay_data:bookodd_data[m]
+                                              
+                                            }
+                                           // console.log('market_bookODD inplay data==>',responseObject);
+                                            //inPlay.push(bookodd_data[m])
+                                           inPlay.push(responseObject)
                                         }
 
                                     }
@@ -982,13 +990,13 @@ var userController = {
             let sql = `INSERT INTO single_bet_info 
 			   (market_id,market_status, market_type,match_id,selection_id, market_start_time, market_end_time, description, event_name, bet_time, user_id, bet_id, bet_status,exposure,runner_name,stake,odd,placed_odd,last_odd,p_and_l,amount, available_balance, protential_profit,user_ip,settled_time,all_teams_exposure_data,master_id)
 			    VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
-            var bet_insert = db.query(sql, [betInfo.market_id, betInfo.market_status, betInfo.market_type, betInfo.match_id, selectionID, betInfo.market_start_time, betInfo.market_end_time, betInfo.description, betInfo.event_name, betInfo.bet_time, betInfo.user_id, betInfo.bet_id, betInfo.bet_status, betInfo.net_exposure, betInfo.runner_name, betInfo.stake, betInfo.odd, betInfo.place_odd, betInfo.last_odd, betInfo.p_and_l, exposure_amt, remain_balance, profit, betInfo.user_ip, betInfo.settled_time, JSON.stringify(all_teams_exposure_data),betInfo.master_id], function(err, rows, fields) {
-                // console.log('query',bet_insert.sql);
+            var bet_insert = db.query(sql, [betInfo.market_id, betInfo.market_status, betInfo.market_type, betInfo.match_id, selectionID, betInfo.market_start_time, betInfo.market_end_time, betInfo.description, betInfo.event_name, betInfo.bet_time, betInfo.user_id, betInfo.bet_id, betInfo.bet_status, net_exposure, betInfo.runner_name, betInfo.stake, betInfo.odd, betInfo.place_odd, betInfo.last_odd, betInfo.p_and_l, exposure_amt, remain_balance, profit, betInfo.user_ip, betInfo.settled_time, JSON.stringify(all_teams_exposure_data),betInfo.master_id], function(err, rows, fields) {
+                 console.log('query',bet_insert.sql);
                 if (!err) {
                     //var update_avl_amt=await update_balance(betInfo.user_id,remain_balance);
                     var betId = rows.insertId;
 
-                    var query = db.query("Update punter set net_exposure=? where punter_id=?", [betInfo.net_exposure, betInfo.user_id], function(err, rows, fields) {
+                    var query = db.query("Update punter set net_exposure=? where punter_id=?", [net_exposure, betInfo.user_id], function(err, rows, fields) {
                         if (!err) {
                             var responseObject = {
                                 status: user_bet_status,
