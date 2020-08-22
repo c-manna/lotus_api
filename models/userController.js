@@ -978,7 +978,7 @@ var userController = {
                      } else {
                         //console.log('others back team name loss',betInfo.runners[i].runnerName+'='+loss);
                         var team_details = {
-                            odd_type: betInfo.odd==0?1:betInfo.odd,
+                            odd_type: betInfo.odd==0?1:0,
                             team_name: betInfo.runners[i].runnerName,
                             amount: betInfo.odd==0? -Math.abs(loss.toFixed(2)) : Math.abs(profit.toFixed(2))
                         }
