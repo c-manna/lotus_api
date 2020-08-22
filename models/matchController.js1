@@ -99,12 +99,9 @@ module.exports = {
  },
 
  openBet: async (req, res, next) => {
-  const userId = req.decoded.punter_id,
-   marketId = req.query.market_id;
+  const userId = req.decoded.punter_id;
   try {
-   let sqlQuery = "SELECT * FROM single_bet_info WHERE market_status =? AND user_id =?";
-   if (marketId) sqlQuery = "SELECT * FROM single_bet_info WHERE market_status =? AND user_id =? AND market_id =?";
-   let dataList = await query(sqlQuery, [0, userId, marketId]);
+   let dataList = await query("SELECT * FROM single_bet_info WHERE market_status =? AND user_id =?", [0, userId]);
    return res.send({
     success: true,
     data: dataList
@@ -247,25 +244,13 @@ module.exports = {
     err: err
    });
   }
- },
 
- getBookmaker: async (req, res, next) => {
-  const marketId = req.params.marketId;
-  const status = (req.query.status ? req.query.status : 1);
-  let sqlQuery = "SELECT status, details FROM bookmaker WHERE market_id= ? AND status= ?";
-  try {
-   let dataList = await query(sqlQuery, [marketId, status]);
-   return res.send({
-    success: true,
-    data: (dataList && dataList.length && dataList[0].details) ? JSON.parse(dataList[0].details) : []
-   });
-  } catch (err) {
-   return res.send({
-    success: false,
-    message: "something went wrong",
-    err: err
-   });
-  }
+  // var sql = db.query("SELECT single_bet_info.market_id , transfer_statement.amount FROM single_bet_info JOIN transfer_statement ON single_bet_info.user_id = transfer_statement.punter_id", ['2750231N005'], function (err, rows, fields) {
+  //  if (!err) {
+  //   console.log(err);
+  //  }
+  //  console.log(rows)
+  // });
  }
 
 };
