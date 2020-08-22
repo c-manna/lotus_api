@@ -995,7 +995,7 @@ var userController = {
                 if (!err) {
                     //var update_avl_amt=await update_balance(betInfo.user_id,remain_balance);
                     var betId = rows.insertId;
-                    let update_balance = check_availableBalance.punter_balance + check_availableBalance.net_exposure - betInfo.liability 
+                    let update_balance = (check_availableBalance.punter_balance + check_availableBalance.net_exposure) - betInfo.liability 
                     var query = db.query("Update punter set net_exposure=?,punter_balance=? where punter_id=?", [ betInfo.net_exposure,update_balance, betInfo.user_id], function(err, rows, fields) {
                         if (!err) {
                             var responseObject = {
