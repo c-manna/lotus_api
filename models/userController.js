@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 var db = require('../dbconnection');
 var express = require('express');
 var router = express.Router();
