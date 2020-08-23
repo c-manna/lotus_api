@@ -151,6 +151,8 @@ router.get("/user-commision", AuthMiddleware.checkToken, matchController.getUser
 router.get("/user-details", AuthMiddleware.checkToken, matchController.getUserCommision);
 router.post("/transfer-statment", AuthMiddleware.checkToken, matchController.transferStatment);
 router.get("/get-bookmaker/:marketId", matchController.getBookmaker);
+router.get("/inplay-match", matchController.inplayMatch);
+router.get("/getmatchInplay", matchController.getmatchInplay);
 
 
 module.exports = router;
