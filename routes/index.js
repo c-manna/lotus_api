@@ -140,7 +140,7 @@ router.post('/getexposure', function(req, res) {
     })
 })
 router.post('/getMaxBetMaxMarket', function(req, res) {
-    userModel.getExposure(req.body, function(response) {
+    userModel.getMaxBetMaxMarket(req.body, function(response) {
         res.json(response);
     })
 })

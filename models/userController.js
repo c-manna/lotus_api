@@ -206,17 +206,14 @@ function available_balanceInfo(userId) {
     })
 }
 
-function event_managementData(eventID, marketType) {
+function event_managementData(eventID) {
     return new Promise(function(resolve, reject) {
-        db.query("SELECT * FROM event_management WHERE event=? AND market=? LIMIT 1", [eventID, marketType], function(err, rows, fields) {
-
-
-
+        db.query("SELECT * FROM event_management WHERE event=?", [eventID], function(err, rows, fields) {
             if (err) {
                 reject('Error');
             } else {
                 if (rows.length > 0) {
-                    resolve(rows[0]);
+                    resolve(rows);
                 } else {
                     resolve(rows.length);
                 }
@@ -1030,23 +1027,12 @@ var userController = {
         })
     },
     getExposure: async function(userData, callback) {
-        var event_info = await event_managementData(userData.event_id, userData.market_type);
-        console.log('event_info ==>', event_info);
-        if (event_info != 0) {
-            var max_bet = event_info.max_bet;
-            var max_market = event_info.max_market;
-        } else {
-            var max_bet = 0;
-            var max_market = 0;
-        }
         var exposureArr = [];
         var fetchExposure = db.query("SELECT * FROM single_bet_info WHERE user_id=? AND match_id=?", [userData.user_id, userData.match_id], function(err, rows, fields) {
             if (!err) {
                 if (rows.length > 0) {
                     for (var i = 0; i <= rows.length - 1; i++) {
                         var responseObject = {
-                            max_bet: max_bet,
-                            max_market: max_market,
                             all_teams_exposure_data: JSON.parse(rows[i].all_teams_exposure_data.replace(/(\r\n|\n|\r)/gm, ""))
                         }
                         exposureArr.push(responseObject);
@@ -1057,11 +1043,6 @@ var userController = {
                         result: exposureArr
                     });
                 } else {
-                    var responseObject = {
-                        max_bet: max_bet,
-                        max_market: max_market
-                    }
-                    exposureArr.push(responseObject);
                     callback({
                         success: false,
                         message: "User data not found",
@@ -1077,24 +1058,11 @@ var userController = {
         })
     },
     getMaxBetMaxMarket: async function(userData, callback) {
-        var event_info = await event_managementData(userData.event_id, userData.market_type);
-        var exposureArr = [];
-        if (event_info != 0) {
-            var max_bet = event_info.max_bet;
-            var max_market = event_info.max_market;
-        } else {
-            var max_bet = 0;
-            var max_market = 0;
-        }
-        var responseObject = {
-            max_bet: max_bet,
-            max_market: max_market
-        }
-        exposureArr.push(responseObject);
+        var event_info = await event_managementData(userData.event_id);
         callback({
             success: true,
             message: "All bet list data",
-            result: exposureArr
+            result: event_info
         });
     },
     getbalanceDetails: async function(userData, callback) {
