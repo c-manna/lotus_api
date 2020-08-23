@@ -855,7 +855,7 @@ var userController = {
     singlePlaceInfo: async function (betInfo, callback) {
         var check_availableBalance = await available_balanceInfo(betInfo.user_id);
         var profit = 0,loss = 0;
-        var remain_balance = Math.abs(check_availableBalance.punter_balance - betInfo.net_exposure);
+        var remain_balance = Math.abs(check_availableBalance.punter_balance + check_availableBalance.net_exposure - betInfo.net_exposure);
         if (betInfo.odd == 0) {
             profit = parseFloat((betInfo.place_odd - 1) * betInfo.stake);
             loss = parseFloat(betInfo.stake);
@@ -889,7 +889,7 @@ var userController = {
             console.log('query', bet_insert.sql);
             if (!err) {
                 var betId = rows.insertId;
-                let update_balance = (check_availableBalance.punter_balance + check_availableBalance.net_exposure) - betInfo.liability
+                let update_balance = Math.abs(check_availableBalance.punter_balance + check_availableBalance.net_exposure - betInfo.net_exposure);
                 var query = db.query("Update punter set net_exposure=?,punter_balance=? where punter_id=?", [betInfo.net_exposure, update_balance, betInfo.user_id], function (err, rows, fields) {
                     if (!err) {
                         var responseObject = {}
