@@ -120,6 +120,13 @@ router.get('/fetch-inplay', function (req, res) {
     })
 
 })
+router.get('/fetch-inplay-event', function (req, res) {
+    //http://172.105.38.170:8000/fetch-inplay-event/?eventID=1
+    userModel.getmatchEventInplay(req.query, function (response) {
+        res.json(response);
+    })
+
+})
 router.post("/single-place-bet", function (req, res) {
 
     userModel.singlePlaceInfo(req.body, function (response) {
@@ -132,7 +139,11 @@ router.post('/getexposure', function (req, res) {
         res.json(response);
     })
 })
-
+router.post('/getMaxBetMaxMarket', function (req, res) {
+    userModel.getMaxBetMaxMarket(req.body, function (response) {
+        res.json(response);
+    })
+})
 router.post('/getbalanceDetails', function (req, res) {
     userModel.getbalanceDetails(req.body, function (response) {
         res.json(response);
@@ -150,9 +161,8 @@ router.get("/user-commision", AuthMiddleware.checkToken, matchController.getUser
 
 router.get("/user-details", AuthMiddleware.checkToken, matchController.getUserCommision);
 router.post("/transfer-statment", AuthMiddleware.checkToken, matchController.transferStatment);
-router.get("/get-bookmaker/:marketId", matchController.getBookmaker);
 router.get("/inplay-match", matchController.inplayMatch);
 router.get("/getmatchInplay", matchController.getmatchInplay);
-
+router.get("/get-bookmaker/:marketId", AuthMiddleware.checkToken, matchController.getBookmaker);
 
 module.exports = router;
