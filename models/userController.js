@@ -791,17 +791,27 @@ var userController = {
     getmatchInplay: async function(userparams, callback) {
 
         var inPlay = [];
-        var allEventCompetition = await event_competition(userparams.eventID);
+        var allEventList = await event_list();
+
+        var event_response = JSON.parse(allEventList);
+        //console.log('event_response ==>',event_response);
+        if(event_response.length >0){
+        for(a=0;a<=event_response.length-1;a++){
+        			var event_ID=event_response[a].eventType;
+        //			console.log('event_id 1==>',event_ID);
+       // var allEventCompetition = await event_competition(userparams.eventID);
+        var allEventCompetition = await event_competition(event_ID);
         var eventCompetitionData = JSON.parse(allEventCompetition);
-       
+       //console.log('eventCompetitionData response ===>',eventCompetitionData);
         if (eventCompetitionData.length > 0) {
             for (var j = 0; j <= eventCompetitionData.length - 1; j++) {
                 var competitionId = eventCompetitionData[j].competition.id;
                 var competitionName = eventCompetitionData[j].competition.name;
                 
-                var matchByCompetetion = await matchby_Competetion(userparams.eventID, competitionId);
+                // var matchByCompetetion = await matchby_Competetion(userparams.eventID, competitionId);
+                var matchByCompetetion = await matchby_Competetion(event_ID, competitionId);
                 var matchCompetitionData = JSON.parse(matchByCompetetion);
-                // console.log('matchByCompetetion==>',matchCompetitionData);
+                //console.log('matchByCompetetion==>',matchCompetitionData);
                 if (matchCompetitionData.length > 0) {
                     for (var i = 0; i <= matchCompetitionData.length - 1; i++) {
 
@@ -820,10 +830,14 @@ var userController = {
                                 // console.log('market_bookODD data==>',bookodd_data);
                                 if (bookodd_data.length > 0) {
                                     for (var m = 0; m <= bookodd_data.length - 1; m++) {
-                                        //console.log('market_bookODD inplay data==>',bookodd_data[m].inplay);
+                                        
                                         if (bookodd_data[m].inplay == true) {
-                                            
+                                            // console.log('market_bookODD inplay data event_ID==>',event_ID);
+                                            // console.log('market_bookODD inplay data competitionName==>',competitionName);
+                                            // console.log('market_bookODD inplay data matcheventID==>',matcheventID);
+                                            // console.log('market_bookODD inplay data matchName==>',matchName);
                                             var responseObject={
+                                            	//event_id:event_ID,
                                                 event_name:competitionName,
                                                 competetion_id:competitionId,
                                                 match_id:matcheventID,
@@ -831,9 +845,34 @@ var userController = {
                                                 inPlay_data:bookodd_data[m]
                                               
                                             }
-                                           // console.log('market_bookODD inplay data==>',responseObject);
+                                        	var inplay_count=db.query("SELECT COUNT(event_id) AS count_num FROM `in_play` WHERE event_id=? LIMIT 1", [event_ID], function(err, rows, fields) {
+                                           		if(!err){
+                                           			console.log('count_num ==>',rows[0].count_num);
+                                           			if(rows[0].count_num > 0){
+                                           				var inplay_update = db.query("Update in_play set inplay_data=? where event_id=?", [JSON.stringify(responseObject), event_ID], function(err, rows, fields) {
+                                           					if(err){
+                                           						return;
+                                           					}else{
+                                           						console.log('update');
+                                           					}
+                                           					
+                                           				})
+                                           			}else{
+                                           				var inplay_insert=db.query("Insert into in_play (event_id,inplay_data) values (?,?)", [event_ID, JSON.stringify(responseObject)], function(err, rows, fields) {
+
+                                           					if(err){
+                                           						return;
+                                           					}else{
+                                           						console.log('insert');
+                                           					}
+                                         				})  					
+                                           			}
+                                           		}
+                                           	
+
+                                            })// console.log('market_bookODD inplay data==>',responseObject);
                                             //inPlay.push(bookodd_data[m])
-                                           inPlay.push(responseObject)
+                                          inPlay.push(responseObject)
                                         }
 
                                     }
@@ -845,12 +884,17 @@ var userController = {
 
             }
             //console.log('inplay array ==>',inPlay)
-            callback({
+            // callback({
+            //     success: true,
+            //     result: inPlay
+            // })
+        }
+        }
+        callback({
                 success: true,
                 result: inPlay
             })
-        }
-
+       }
     },
     singlePlaceInfo: async function (betInfo, callback) {
         var check_availableBalance = await available_balanceInfo(betInfo.user_id);
@@ -886,7 +930,7 @@ var userController = {
                (market_id,market_status, market_type,match_id,selection_id, market_start_time, market_end_time, description, event_name, bet_time, user_id, bet_id, bet_status,exposure,runner_name,stake,odd,placed_odd,last_odd,p_and_l,amount, available_balance, protential_profit,user_ip,settled_time,all_teams_exposure_data,master_id)
                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
         var bet_insert = db.query(sql, [betInfo.market_id, betInfo.market_status, betInfo.market_type, betInfo.match_id, selectionID, betInfo.market_start_time, betInfo.market_end_time, betInfo.description, betInfo.event_name, betInfo.bet_time, betInfo.user_id, betInfo.bet_id, betInfo.bet_status, betInfo.liability, betInfo.runner_name, betInfo.stake, betInfo.odd, betInfo.place_odd, betInfo.last_odd, betInfo.p_and_l, betInfo.amount, remain_balance, profit, betInfo.user_ip, betInfo.settled_time, JSON.stringify(all_teams_exposure_data), betInfo.master_id], function (err, rows, fields) {
-            console.log('query', bet_insert.sql);
+            //console.log('query', bet_insert.sql);
             if (!err) {
                 var betId = rows.insertId;
                 let update_balance = Math.abs(check_availableBalance.punter_balance + check_availableBalance.net_exposure - betInfo.net_exposure);
@@ -917,8 +961,7 @@ var userController = {
         })
     },
     getExposure: async function (userData, callback) {
-    
-       /*  var event_info = await event_managementData(event_id, marketType);
+        var event_info = await event_managementData(userData.event_id, userData.market_type);
         console.log('event_info ==>', event_info);
         if (event_info != 0) {
             var max_bet = event_info.max_bet;
@@ -926,97 +969,43 @@ var userController = {
         } else {
             var max_bet = 0;
             var max_market = 0;
-        } */
-        //console.log('getExposure ==>',userData);
+        }
         var exposureArr = [];
-        var check_availableBalance = await available_balanceInfo(userData.user_id);
-    
-        if (check_availableBalance != 0) {
-    
-            var exposure_limit_balance = check_availableBalance.punter_exposure_limit;
-            var punter_betting_status = check_availableBalance.punter_betting_status;
-            var fetchExposure = db.query("SELECT * FROM single_bet_info WHERE user_id=? AND match_id=?", [userData.user_id, userData.match_id], function (err, rows, fields) {
-                if (!err) {
-                    if (rows.length > 0) {
-                        //console.log("bet info ==>",rows);
-                        for (var i = 0; i <= rows.length - 1; i++) {
-                            var oddType = (rows[i].odd == '0') ? 'Back' : 'Lay';
-                            var responseObject = {
-                                bet_id: rows[i].single_bet_id,
-                                placed_odd: rows[i].placed_odd,
-                                stake_amount: rows[i].stake,
-                                net_exposure: rows[i].exposure,
-                                protential_profit: rows[i].protential_profit,
-                                liability_amount: rows[i].amount,
-                                available_balance: rows[i].available_balance,
-                                exposure_limit: exposure_limit_balance,
-                                punter_betting_status: punter_betting_status,
-                                match_name: rows[i].description,
-                                event_name: rows[i].event_name,
-                                bet_team: rows[i].runner_name,
-                                odd_type: oddType,
-                                market_id: rows[i].market_id,
-                                market_status: rows[i].market_status,
-                                bet_status: rows[i].bet_status,
-                                all_teams_exposure_data: JSON.parse(rows[i].all_teams_exposure_data.replace(/(\r\n|\n|\r)/gm, ""))
-                            }
-                            exposureArr.push(responseObject);
+        var fetchExposure = db.query("SELECT * FROM single_bet_info WHERE user_id=? AND match_id=?", [userData.user_id, userData.match_id], function (err, rows, fields) {
+            if (!err) {
+                if (rows.length > 0) {
+                    for (var i = 0; i <= rows.length - 1; i++) {
+                        var responseObject = {
+                            max_bet: max_bet,
+                            max_market: max_market,
+                            all_teams_exposure_data: JSON.parse(rows[i].all_teams_exposure_data.replace(/(\r\n|\n|\r)/gm, ""))
                         }
-                        callback({
-                            success: true,
-                            message: "All bet list data",
-                            result: exposureArr
-                        });
-                    } else {
-                        var user = db.query("SELECT `punter`.`punter_balance`,`punter`.`punter_exposure_limit`,`punter`.`punter_betting_status`,`punter`.`net_exposure` FROM punter WHERE punter_id=? LIMIT 1", [userData.user_id], function (err, rows, fields) {
-                            if (err) {
-                                callback({
-                                    success: false,
-                                    message: "Some thing went wrong"
-                                })
-                            } else {
-                                if (rows.length > 0) {
-                                    //resolve(rows[0]);
-                                    // console.log('check_availableBalance ==>',rows[0]);
-                                    var responseObject = {
-                                        available_balance: rows[0].punter_balance,
-                                        exposure_limit: rows[0].punter_exposure_limit,
-                                        net_exposure: rows[0].net_exposure,
-                                        punter_betting_status: rows[0].punter_betting_status,
-                                    }
-                                    exposureArr.push(responseObject);
-                                    callback({
-                                        success: true,
-                                        message: "User data",
-                                        result: exposureArr
-                                    });
-                                } else {
-                                    callback({
-                                        success: false,
-                                        message: "User data not found",
-                                        result: exposureArr
-                                    });
-                                }
-    
-    
-                            }
-                        })
-                        //console.log('check_availableBalance ==>',check_availableBalance);
+                        exposureArr.push(responseObject);
                     }
+                    callback({
+                        success: true,
+                        message: "All bet list data",
+                        result: exposureArr
+                    });
                 } else {
+                    var responseObject = {
+                        max_bet: max_bet,
+                        max_market: max_market
+                    }
+                    exposureArr.push(responseObject);
                     callback({
                         success: false,
-                        message: "Some thing went wrong"
-                    })
+                        message: "User data not found",
+                        result: exposureArr
+                    });
                 }
-            })
-        } else {
-            callback({
-                success: false,
-                message: "User data not found",
-                result: exposureArr
-            });
-        }
+            } else {
+                callback({
+                    success: false,
+                    message: "Some thing went wrong"
+                })
+            }
+        })
     },
     getbalanceDetails:async function(userData,callback){
         var plunter = db.query("SELECT punter.* FROM punter WHERE punter_id=? LIMIT 1", [userData.user_id], function (err, rows, fields) {
