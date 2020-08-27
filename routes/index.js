@@ -146,6 +146,11 @@ router.post('/getexposure', function(req, res) {
         res.json(response);
     })
 })
+router.post('/getExposureFancy', function(req, res) {
+    userModel.getExposureFancy(req.body, function(response) {
+        res.json(response);
+    })
+})
 router.post('/getMaxBetMaxMarket', function(req, res) {
     userModel.getMaxBetMaxMarket(req.body, function(response) {
         res.json(response);
