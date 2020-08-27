@@ -134,6 +134,13 @@ router.post("/single-place-bet", function(req, res) {
     })
 })
 
+router.post("/single-place-bet-for-fancy", function(req, res) {
+
+    userModel.singlePlaceInfoForFancy(req.body, function(response) {
+        res.json(response);
+    })
+})
+
 router.post('/getexposure', function(req, res) {
     userModel.getExposure(req.body, function(response) {
         res.json(response);

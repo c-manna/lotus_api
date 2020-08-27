@@ -976,7 +976,6 @@ var userController = {
         var all_teams_exposure_data = [];
         for (var i = 0; i <= betInfo.runners.length - 1; i++) {
             if (betInfo.runners[i].runnerName == betInfo.runner_name) {
-                var selectionID = betInfo.runners[i].selectionId;
                 var team_details = {
                     odd_type: betInfo.odd,
                     team_name: betInfo.runners[i].runnerName,
@@ -995,7 +994,47 @@ var userController = {
         let sql = `INSERT INTO single_bet_info 
                (market_id,market_status, market_type,match_id,selection_id, market_start_time, market_end_time, description, event_name, bet_time, user_id, bet_id, bet_status,exposure,runner_name,stake,odd,placed_odd,last_odd,p_and_l,amount, available_balance, protential_profit,user_ip,settled_time,all_teams_exposure_data,master_id)
                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
-        var bet_insert = db.query(sql, [betInfo.market_id, betInfo.market_status, betInfo.market_type, betInfo.match_id, selectionID, betInfo.market_start_time, betInfo.market_end_time, betInfo.description, betInfo.event_name, betInfo.bet_time, betInfo.user_id, betInfo.bet_id, betInfo.bet_status, betInfo.liability, betInfo.runner_name, betInfo.stake, betInfo.odd, betInfo.place_odd, betInfo.last_odd, betInfo.p_and_l, betInfo.amount, remain_balance, profit, betInfo.user_ip, betInfo.settled_time, JSON.stringify(all_teams_exposure_data), betInfo.master_id], function (err, rows, fields) {
+        var bet_insert = db.query(sql, [betInfo.market_id, betInfo.market_status, betInfo.market_type, betInfo.match_id, betInfo.selection_id, betInfo.market_start_time, betInfo.market_end_time, betInfo.description, betInfo.event_name, betInfo.bet_time, betInfo.user_id, betInfo.bet_id, betInfo.bet_status, betInfo.liability, betInfo.runner_name, betInfo.stake, betInfo.odd, betInfo.place_odd, betInfo.last_odd, betInfo.p_and_l, betInfo.amount, remain_balance, profit, betInfo.user_ip, betInfo.settled_time, JSON.stringify(all_teams_exposure_data), betInfo.master_id], function (err, rows, fields) {
+            //console.log('query', bet_insert.sql);
+            if (!err) {
+                var betId = rows.insertId;
+                let update_balance = Math.abs(check_availableBalance.punter_balance + check_availableBalance.net_exposure - betInfo.net_exposure);
+                var query = db.query("Update punter set net_exposure=?,punter_balance=? where punter_id=?", [betInfo.net_exposure, update_balance, betInfo.user_id], function (err, rows, fields) {
+                    if (!err) {
+                        var responseObject = {}
+                        callback({
+                            success: true,
+                            message: 'Bet placed success',
+                            result: responseObject
+                        })
+                    } else {
+                        callback({
+                            success: false,
+                            message: 'Some thing went wrong',
+                            result: ''
+                        })
+                    }
+                })
+
+            } else {
+                callback({
+                    success: false,
+                    message: 'Some thing went wrong',
+                    result: ''
+                })
+            }
+        })
+    },
+    singlePlaceInfoForFancy: async function (betInfo, callback) {
+        var check_availableBalance = await available_balanceInfo(betInfo.user_id);
+        var remain_balance = Math.abs(check_availableBalance.punter_balance + check_availableBalance.net_exposure - betInfo.net_exposure);
+
+        var all_teams_exposure_data = [];
+
+        let sql = `INSERT INTO single_bet_info 
+               (market_id,market_status, market_type,match_id,selection_id, market_start_time, market_end_time, description, event_name, bet_time, user_id, bet_id, bet_status,exposure,runner_name,stake,odd,placed_odd,last_odd,p_and_l,amount, available_balance, protential_profit,user_ip,settled_time,all_teams_exposure_data,master_id)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
+        var bet_insert = db.query(sql, [betInfo.market_id, betInfo.market_status, betInfo.market_type, betInfo.match_id, betInfo.selection_id, betInfo.market_start_time, betInfo.market_end_time, betInfo.description, betInfo.event_name, betInfo.bet_time, betInfo.user_id, betInfo.bet_id, betInfo.bet_status, betInfo.liability, betInfo.runner_name, betInfo.stake, betInfo.odd, betInfo.place_odd, betInfo.last_odd, betInfo.p_and_l, betInfo.amount, remain_balance, betInfo.profit, betInfo.user_ip, betInfo.settled_time, JSON.stringify(0), betInfo.master_id], function (err, rows, fields) {
             //console.log('query', bet_insert.sql);
             if (!err) {
                 var betId = rows.insertId;
