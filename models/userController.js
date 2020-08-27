@@ -17,14 +17,14 @@ const jwt = require('jsonwebtoken');
 
 function event_list() {
 
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         request.get({
             headers: {
                 'content-type': 'application/json'
             },
             url: "http://178.62.105.201/api/v1/fetch_data?Action=listEventTypes",
             //form: JSON.stringify(req.body)
-        }, function(error, response, body) {
+        }, function (error, response, body) {
             //console.log('Hello World',body);
             // callback({success:true,data:body});
             // //res.json(body);
@@ -40,14 +40,14 @@ function event_list() {
 
 function event_competition(eventID) {
 
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         request.get({
             headers: {
                 'content-type': 'application/json'
             },
             url: "http://178.62.105.201/api/v1/fetch_data?Action=listCompetitions&EventTypeID=" + eventID,
 
-        }, function(error, response, body) {
+        }, function (error, response, body) {
             if (error) {
                 reject(error)
             } else {
@@ -60,14 +60,14 @@ function event_competition(eventID) {
 }
 
 function matchby_Competetion(eventID, competitionId) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         request.get({
             headers: {
                 'content-type': 'application/json'
             },
             url: "http://178.62.105.201/api/v1/fetch_data?Action=listEvents&EventTypeID=" + eventID + "&CompetitionID=" + competitionId,
 
-        }, function(error, response, body) {
+        }, function (error, response, body) {
             if (error) {
                 reject(error)
             } else {
@@ -80,14 +80,14 @@ function matchby_Competetion(eventID, competitionId) {
 }
 
 function market_match(matcheventID) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         request.get({
             headers: {
                 'content-type': 'application/json'
             },
             url: "http://178.62.105.201/api/v1/fetch_data?Action=listMarketTypes&EventID=" + matcheventID,
 
-        }, function(error, response, body) {
+        }, function (error, response, body) {
             if (error) {
                 reject(error)
             } else {
@@ -100,14 +100,14 @@ function market_match(matcheventID) {
 }
 
 function marketRunner(marketID) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         request.get({
             headers: {
                 'content-type': 'application/json'
             },
             url: "http://178.62.105.201/api/v1/fetch_data?Action=listMarketRunner&MarketID=" + marketID,
             //form: JSON.stringify(req.body)
-        }, function(error, response, body) {
+        }, function (error, response, body) {
             //callback({success:true,data:body});
             if (error) {
                 reject(error)
@@ -121,14 +121,14 @@ function marketRunner(marketID) {
 }
 
 function book_odd(marketID) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         request.get({
             headers: {
                 'content-type': 'application/json'
             },
             url: "http://178.62.105.201/api/v1/listMarketBookOdds?market_id=" + marketID,
             //form: JSON.stringify(req.body)
-        }, function(error, response, body) {
+        }, function (error, response, body) {
             //callback({success:true,data:body});
             if (error) {
                 reject(error)
@@ -142,14 +142,14 @@ function book_odd(marketID) {
 }
 
 function marketBooksession(matchID) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
         request.get({
             headers: {
                 'content-type': 'application/json'
             },
             url: "http://178.62.105.201/api/v1/listMarketBookSession?match_id=" + matchID,
             //form: JSON.stringify(req.body)
-        }, function(error, response, body) {
+        }, function (error, response, body) {
             //callback({success:true,data:body});
             if (error) {
                 reject(error)
@@ -163,8 +163,8 @@ function marketBooksession(matchID) {
 }
 
 function netExposure(userId) {
-    return new Promise(function(resolve, reject) {
-        db.query("SELECT * FROM single_bet_info WHERE user_id=? LIMIT 1", [userId], function(err, rows, fields) {
+    return new Promise(function (resolve, reject) {
+        db.query("SELECT * FROM single_bet_info WHERE user_id=? LIMIT 1", [userId], function (err, rows, fields) {
 
 
 
@@ -185,8 +185,8 @@ function netExposure(userId) {
 }
 
 function available_balanceInfo(userId) {
-    return new Promise(function(resolve, reject) {
-        db.query("SELECT `punter`.`punter_balance`,`punter`.`punter_exposure_limit`,`punter`.`punter_betting_status`,`punter`.`net_exposure` FROM punter WHERE punter_id=? LIMIT 1", [userId], function(err, rows, fields) {
+    return new Promise(function (resolve, reject) {
+        db.query("SELECT `punter`.`punter_balance`,`punter`.`punter_exposure_limit`,`punter`.`punter_betting_status`,`punter`.`net_exposure` FROM punter WHERE punter_id=? LIMIT 1", [userId], function (err, rows, fields) {
 
 
 
@@ -207,8 +207,8 @@ function available_balanceInfo(userId) {
 }
 
 function event_managementData(eventID) {
-    return new Promise(function(resolve, reject) {
-        db.query("SELECT * FROM event_management WHERE event=?", [eventID], function(err, rows, fields) {
+    return new Promise(function (resolve, reject) {
+        db.query("SELECT * FROM event_management WHERE event=?", [eventID], function (err, rows, fields) {
             if (err) {
                 reject('Error');
             } else {
@@ -227,7 +227,7 @@ function event_managementData(eventID) {
 
 
 var userController = {
-    userlogin: async(loginData, callback) => {
+    userlogin: async (loginData, callback) => {
         try {
             const userData = await query("SELECT punter.* FROM punter WHERE punter_user_name=? LIMIT 1", [loginData.user]);
             if (!(userData && userData.length)) return callback({
@@ -265,19 +265,19 @@ var userController = {
             });
         }
     },
-    getEventFetch: async function(userparams, callback) {
+    getEventFetch: async function (userparams, callback) {
 
 
         var allEventList = await event_list();
         //console.log('allEventList',allEventList);
         var responseList = JSON.parse(allEventList);
         if (responseList.length > 0) {
-            db.query("SELECT events.* FROM events", function(err, rows, fields) {
+            db.query("SELECT events.* FROM events", function (err, rows, fields) {
                 //console.log(rows[0]);
 
                 if (rows.length > 0) {
                     var event_id = rows[0].id;
-                    db.query("Update events set event_data=?,is_login=? where id=?", [allEventList, 1, event_id], function(err, rows, fields) {
+                    db.query("Update events set event_data=?,is_login=? where id=?", [allEventList, 1, event_id], function (err, rows, fields) {
                         if (err) {
                             //console.log('update ==>',rows)
                             callback({
@@ -296,7 +296,7 @@ var userController = {
 
                     })
                 } else {
-                    db.query("Insert into events (event_data,is_login) values (?,?)", [allEventList, 0], function(err, rows, fields) {
+                    db.query("Insert into events (event_data,is_login) values (?,?)", [allEventList, 0], function (err, rows, fields) {
 
                         if (err) {
 
@@ -328,7 +328,7 @@ var userController = {
 
 
     },
-    getEventCompetition: async function(userparams, callback) {
+    getEventCompetition: async function (userparams, callback) {
 
 
         //var update_event = await event_status(userparams.eventID);
@@ -338,12 +338,12 @@ var userController = {
         var responseList = JSON.parse(allEventCompetition);
         if (responseList.length > 0) {
 
-            db.query("SELECT COUNT(event_id) AS count_num FROM `competition` WHERE event_id=? LIMIT 1", [userparams.eventID], function(err, rows, fields) {
+            db.query("SELECT COUNT(event_id) AS count_num FROM `competition` WHERE event_id=? LIMIT 1", [userparams.eventID], function (err, rows, fields) {
 
                 // console.log("competition",rows[0].count_num)
                 if (rows[0].count_num > 0) {
 
-                    db.query("Update competition set competition_json=? where event_id=?", [allEventCompetition, userparams.eventID], function(err, rows, fields) {
+                    db.query("Update competition set competition_json=? where event_id=?", [allEventCompetition, userparams.eventID], function (err, rows, fields) {
                         if (err) {
                             //console.log('update ==>',rows)
                             callback({
@@ -363,7 +363,7 @@ var userController = {
                     })
 
                 } else {
-                    db.query("Insert into competition (event_id,competition_json,status) values (?,?,?)", [userparams.eventID, allEventCompetition, 1], function(err, rows, fields) {
+                    db.query("Insert into competition (event_id,competition_json,status) values (?,?,?)", [userparams.eventID, allEventCompetition, 1], function (err, rows, fields) {
 
                         if (err) {
 
@@ -405,7 +405,7 @@ var userController = {
 
 
     },
-    getmatchBySereis: async function(userparams, callback) {
+    getmatchBySereis: async function (userparams, callback) {
 
         var matchByCompetetion = await matchby_Competetion(userparams.eventID, userparams.competitionId);
 
@@ -413,12 +413,12 @@ var userController = {
         var responseList = JSON.parse(matchByCompetetion);
 
         if (responseList.length > 0) {
-            db.query("SELECT matches.* FROM `matches` WHERE event_id=? AND competition_id=? LIMIT 1", [userparams.eventID, userparams.competitionId], function(err, rows, fields) {
+            db.query("SELECT matches.* FROM `matches` WHERE event_id=? AND competition_id=? LIMIT 1", [userparams.eventID, userparams.competitionId], function (err, rows, fields) {
 
                 //console.log("matches",rows.length)
                 if (rows.length > 0) {
 
-                    db.query("Update matches set match_json=? where event_id=? AND competition_id=?", [matchByCompetetion, userparams.eventID, userparams.competitionId], function(err, rows, fields) {
+                    db.query("Update matches set match_json=? where event_id=? AND competition_id=?", [matchByCompetetion, userparams.eventID, userparams.competitionId], function (err, rows, fields) {
                         if (err) {
                             //console.log('update ==>',rows)
                             callback({
@@ -439,7 +439,7 @@ var userController = {
                     })
 
                 } else {
-                    db.query("Insert into matches (event_id,match_json,competition_id) values (?,?,?)", [userparams.eventID, matchByCompetetion, userparams.competitionId], function(err, rows, fields) {
+                    db.query("Insert into matches (event_id,match_json,competition_id) values (?,?,?)", [userparams.eventID, matchByCompetetion, userparams.competitionId], function (err, rows, fields) {
 
                         if (err) {
 
@@ -479,19 +479,19 @@ var userController = {
 
 
 
-    getmarketBymatch: async function(userparams, callback) {
+    getmarketBymatch: async function (userparams, callback) {
 
         var fetchmarketMatch = await market_match(userparams.matcheventID);
 
         var responseList = JSON.parse(fetchmarketMatch);
 
         if (responseList.length > 0) {
-            db.query("SELECT market.* FROM `market` WHERE match_event_id=? LIMIT 1", [userparams.matcheventID], function(err, rows, fields) {
+            db.query("SELECT market.* FROM `market` WHERE match_event_id=? LIMIT 1", [userparams.matcheventID], function (err, rows, fields) {
 
 
                 if (rows.length > 0) {
 
-                    db.query("Update market set market_json=?,event_id=?,competetion_id=? where match_event_id=?", [fetchmarketMatch, userparams.eventID, userparams.competitionId, userparams.matcheventID], function(err, rows, fields) {
+                    db.query("Update market set market_json=?,event_id=?,competetion_id=? where match_event_id=?", [fetchmarketMatch, userparams.eventID, userparams.competitionId, userparams.matcheventID], function (err, rows, fields) {
                         if (err) {
 
                             callback({
@@ -512,7 +512,7 @@ var userController = {
                     })
 
                 } else {
-                    db.query("Insert into market (match_event_id,market_json,event_id,competetion_id) values (?,?,?,?)", [userparams.matcheventID, fetchmarketMatch, userparams.eventID, userparams.competitionId], function(err, rows, fields) {
+                    db.query("Insert into market (match_event_id,market_json,event_id,competetion_id) values (?,?,?,?)", [userparams.matcheventID, fetchmarketMatch, userparams.eventID, userparams.competitionId], function (err, rows, fields) {
 
                         if (err) {
 
@@ -551,19 +551,19 @@ var userController = {
 
     },
 
-    getmarketByrunner: async function(userparams, callback) {
+    getmarketByrunner: async function (userparams, callback) {
 
         var fetch_market_runner = await marketRunner(userparams.marketID);
 
         var responseList = JSON.parse(fetch_market_runner);
 
         if (responseList.length > 0) {
-            db.query("SELECT market_runner.* FROM `market_runner` WHERE market_id=? LIMIT 1", [userparams.marketID], function(err, rows, fields) {
+            db.query("SELECT market_runner.* FROM `market_runner` WHERE market_id=? LIMIT 1", [userparams.marketID], function (err, rows, fields) {
 
 
                 if (rows.length > 0) {
 
-                    db.query("Update market_runner set runner_data=?,event_id=?,competetion_id=? where market_id=?", [fetch_market_runner, userparams.eventID, userparams.competitionId, userparams.marketID], function(err, rows, fields) {
+                    db.query("Update market_runner set runner_data=?,event_id=?,competetion_id=? where market_id=?", [fetch_market_runner, userparams.eventID, userparams.competitionId, userparams.marketID], function (err, rows, fields) {
 
                         if (err) {
 
@@ -585,7 +585,7 @@ var userController = {
                     })
 
                 } else {
-                    db.query("Insert into market_runner (market_id,runner_data,event_id,competetion_id) values (?,?,?,?)", [userparams.marketID, fetch_market_runner, userparams.eventID, userparams.competitionId], function(err, rows, fields) {
+                    db.query("Insert into market_runner (market_id,runner_data,event_id,competetion_id) values (?,?,?,?)", [userparams.marketID, fetch_market_runner, userparams.eventID, userparams.competitionId], function (err, rows, fields) {
 
                         if (err) {
 
@@ -623,19 +623,19 @@ var userController = {
 
 
     },
-    getmarketBookOD: async function(userparams, callback) {
+    getmarketBookOD: async function (userparams, callback) {
 
         var market_bookODD = await book_odd(userparams.marketID);
 
         var responseList = JSON.parse(market_bookODD);
         //console.log('responseList ==>',responseList.length);
         if (responseList.length > 0) {
-            db.query("SELECT market_odds.* FROM `market_odds` WHERE market_id=? LIMIT 1", [userparams.marketID], function(err, rows, fields) {
+            db.query("SELECT market_odds.* FROM `market_odds` WHERE market_id=? LIMIT 1", [userparams.marketID], function (err, rows, fields) {
 
                 //console.log("matches",rows.length)
                 if (rows.length > 0) {
 
-                    db.query("Update market_odds set market_odd_data=?,event_id=?,competetion_id=? where market_id=?", [market_bookODD, userparams.eventID, userparams.competitionId, userparams.marketID], function(err, rows, fields) {
+                    db.query("Update market_odds set market_odd_data=?,event_id=?,competetion_id=? where market_id=?", [market_bookODD, userparams.eventID, userparams.competitionId, userparams.marketID], function (err, rows, fields) {
                         if (err) {
                             //console.log('update ==>',rows)
                             callback({
@@ -656,7 +656,7 @@ var userController = {
                     })
 
                 } else {
-                    db.query("Insert into market_odds (market_id,market_odd_data,event_id,competetion_id) values (?,?,?,?)", [userparams.marketID, market_bookODD, userparams.eventID, userparams.competitionId], function(err, rows, fields) {
+                    db.query("Insert into market_odds (market_id,market_odd_data,event_id,competetion_id) values (?,?,?,?)", [userparams.marketID, market_bookODD, userparams.eventID, userparams.competitionId], function (err, rows, fields) {
 
                         if (err) {
 
@@ -694,19 +694,19 @@ var userController = {
 
     },
 
-    getmarketBooksession: async function(userparams, callback) {
+    getmarketBooksession: async function (userparams, callback) {
 
         var session_bookData = await marketBooksession(userparams.matchID);
         //console.log('session_bookData = >',session_bookData);
         var responseList = JSON.parse(session_bookData);
         //console.log('responseList ==>',responseList.length);
         if (responseList.length > 0) {
-            db.query("SELECT session.* FROM `session` WHERE match_id=? LIMIT 1", [userparams.matchID], function(err, rows, fields) {
+            db.query("SELECT session.* FROM `session` WHERE match_id=? LIMIT 1", [userparams.matchID], function (err, rows, fields) {
 
                 //console.log("matches",rows.length)
                 if (rows.length > 0) {
 
-                    db.query("Update session set session_data=?,event_id=?,competetion_id=? where match_id=?", [session_bookData, userparams.eventID, userparams.competitionId, userparams.matchID], function(err, rows, fields) {
+                    db.query("Update session set session_data=?,event_id=?,competetion_id=? where match_id=?", [session_bookData, userparams.eventID, userparams.competitionId, userparams.matchID], function (err, rows, fields) {
                         if (err) {
                             //console.log('update ==>',rows)
                             callback({
@@ -727,7 +727,7 @@ var userController = {
                     })
 
                 } else {
-                    db.query("Insert into session (match_id,session_data,event_id,competetion_id) values (?,?,?,?)", [userparams.matchID, session_bookData, userparams.eventID, userparams.competitionId], function(err, rows, fields) {
+                    db.query("Insert into session (match_id,session_data,event_id,competetion_id) values (?,?,?,?)", [userparams.matchID, session_bookData, userparams.eventID, userparams.competitionId], function (err, rows, fields) {
 
                         if (err) {
 
@@ -764,14 +764,14 @@ var userController = {
         }
 
     },
-    getmatchByScore: async function(userparams, callback) {
+    getmatchByScore: async function (userparams, callback) {
         request.get({
             headers: {
                 'content-type': 'application/json'
             },
             url: ": http://178.62.105.201/api/v1/score?match_id=" + userparams.matchID,
             //form: JSON.stringify(req.body)
-        }, function(error, response, body) {
+        }, function (error, response, body) {
             callback({
                 success: true,
                 data: body
@@ -785,7 +785,7 @@ var userController = {
         });
     },
 
-    getmatchInplay: async function(userparams, callback) {
+    getmatchInplay: async function (userparams, callback) {
 
         var inPlay = [];
         var allEventList = await event_list();
@@ -834,7 +834,7 @@ var userController = {
                                                     // console.log('market_bookODD inplay data matcheventID==>',matcheventID);
                                                     // console.log('market_bookODD inplay data matchName==>',matchName);
                                                     var responseObject = {
-                                                        event_id:event_ID,
+                                                        event_id: event_ID,
                                                         event_name: competitionName,
                                                         competetion_id: competitionId,
                                                         match_id: matcheventID,
@@ -869,9 +869,9 @@ var userController = {
 
 
                                                     //     }) 
-                                                         // console.log('market_bookODD inplay data==>',responseObject);
-                                                        //inPlay.push(bookodd_data[m])
-                                                    
+                                                    // console.log('market_bookODD inplay data==>',responseObject);
+                                                    //inPlay.push(bookodd_data[m])
+
                                                 }
 
                                             }
@@ -889,7 +889,7 @@ var userController = {
                     // })
                 }
             }
-            
+
 
             callback({
                 success: true,
@@ -897,17 +897,17 @@ var userController = {
             })
         }
     },
-    getmatchEventInplay: async function(userparams, callback) {
+    getmatchEventInplay: async function (userparams, callback) {
 
         var inPlay = [];
         var allEventCompetition = await event_competition(userparams.eventID);
         var eventCompetitionData = JSON.parse(allEventCompetition);
-       
+
         if (eventCompetitionData.length > 0) {
             for (var j = 0; j <= eventCompetitionData.length - 1; j++) {
                 var competitionId = eventCompetitionData[j].competition.id;
                 var competitionName = eventCompetitionData[j].competition.name;
-                
+
                 var matchByCompetetion = await matchby_Competetion(userparams.eventID, competitionId);
                 var matchCompetitionData = JSON.parse(matchByCompetetion);
                 // console.log('matchByCompetetion==>',matchCompetitionData);
@@ -916,7 +916,7 @@ var userController = {
 
                         //inPlay.push(matchCompetitionData[i].event);
                         let matcheventID = matchCompetitionData[i].event.id;
-                        var matchName=matchCompetitionData[i].event.name;
+                        var matchName = matchCompetitionData[i].event.name;
                         var fetchmarketMatch = await market_match(matcheventID);
                         let fetchmarketMatchData = JSON.parse(fetchmarketMatch);
                         //console.log('fetchmarketMatch==>',fetchmarketMatchData);
@@ -931,18 +931,18 @@ var userController = {
                                     for (var m = 0; m <= bookodd_data.length - 1; m++) {
                                         //console.log('market_bookODD inplay data==>',bookodd_data[m].inplay);
                                         if (bookodd_data[m].inplay == true) {
-                                            
-                                            var responseObject={
-                                                event_name:competitionName,
-                                                competetion_id:competitionId,
-                                                match_id:matcheventID,
-                                                match_name:matchName,
-                                                inPlay_data:bookodd_data[m]
-                                              
+
+                                            var responseObject = {
+                                                event_name: competitionName,
+                                                competetion_id: competitionId,
+                                                match_id: matcheventID,
+                                                match_name: matchName,
+                                                inPlay_data: bookodd_data[m]
+
                                             }
-                                           // console.log('market_bookODD inplay data==>',responseObject);
+                                            // console.log('market_bookODD inplay data==>',responseObject);
                                             //inPlay.push(bookodd_data[m])
-                                           inPlay.push(responseObject)
+                                            inPlay.push(responseObject)
                                         }
 
                                     }
@@ -961,7 +961,7 @@ var userController = {
         }
 
     },
-    singlePlaceInfo: async function(betInfo, callback) {
+    singlePlaceInfo: async function (betInfo, callback) {
         var check_availableBalance = await available_balanceInfo(betInfo.user_id);
         var profit = 0,
             loss = 0;
@@ -995,12 +995,12 @@ var userController = {
         let sql = `INSERT INTO single_bet_info 
                (market_id,market_status, market_type,match_id,selection_id, market_start_time, market_end_time, description, event_name, bet_time, user_id, bet_id, bet_status,exposure,runner_name,stake,odd,placed_odd,last_odd,p_and_l,amount, available_balance, protential_profit,user_ip,settled_time,all_teams_exposure_data,master_id)
                 VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
-        var bet_insert = db.query(sql, [betInfo.market_id, betInfo.market_status, betInfo.market_type, betInfo.match_id, selectionID, betInfo.market_start_time, betInfo.market_end_time, betInfo.description, betInfo.event_name, betInfo.bet_time, betInfo.user_id, betInfo.bet_id, betInfo.bet_status, betInfo.liability, betInfo.runner_name, betInfo.stake, betInfo.odd, betInfo.place_odd, betInfo.last_odd, betInfo.p_and_l, betInfo.amount, remain_balance, profit, betInfo.user_ip, betInfo.settled_time, JSON.stringify(all_teams_exposure_data), betInfo.master_id], function(err, rows, fields) {
+        var bet_insert = db.query(sql, [betInfo.market_id, betInfo.market_status, betInfo.market_type, betInfo.match_id, selectionID, betInfo.market_start_time, betInfo.market_end_time, betInfo.description, betInfo.event_name, betInfo.bet_time, betInfo.user_id, betInfo.bet_id, betInfo.bet_status, betInfo.liability, betInfo.runner_name, betInfo.stake, betInfo.odd, betInfo.place_odd, betInfo.last_odd, betInfo.p_and_l, betInfo.amount, remain_balance, profit, betInfo.user_ip, betInfo.settled_time, JSON.stringify(all_teams_exposure_data), betInfo.master_id], function (err, rows, fields) {
             //console.log('query', bet_insert.sql);
             if (!err) {
                 var betId = rows.insertId;
                 let update_balance = Math.abs(check_availableBalance.punter_balance + check_availableBalance.net_exposure - betInfo.net_exposure);
-                var query = db.query("Update punter set net_exposure=?,punter_balance=? where punter_id=?", [betInfo.net_exposure, update_balance, betInfo.user_id], function(err, rows, fields) {
+                var query = db.query("Update punter set net_exposure=?,punter_balance=? where punter_id=?", [betInfo.net_exposure, update_balance, betInfo.user_id], function (err, rows, fields) {
                     if (!err) {
                         var responseObject = {}
                         callback({
@@ -1026,9 +1026,9 @@ var userController = {
             }
         })
     },
-    getExposure: async function(userData, callback) {
+    getExposure: async function (userData, callback) {
         var exposureArr = [];
-        var fetchExposure = db.query("SELECT * FROM single_bet_info WHERE user_id=? AND match_id=?", [userData.user_id, userData.match_id], function(err, rows, fields) {
+        var fetchExposure = db.query("SELECT * FROM single_bet_info WHERE user_id=? AND match_id=?", [userData.user_id, userData.match_id], function (err, rows, fields) {
             if (!err) {
                 if (rows.length > 0) {
                     for (var i = 0; i <= rows.length - 1; i++) {
@@ -1057,16 +1057,37 @@ var userController = {
             }
         })
     },
-    getMaxBetMaxMarket: async function(userData, callback) {
+    getMaxBetMaxMarket: async function (userData, callback) {
         var event_info = await event_managementData(userData.event_id);
         callback({
             success: true,
-            message: "All bet list data",
+            message: "Max bet max market info",
             result: event_info
         });
     },
-    getbalanceDetails: async function(userData, callback) {
-        var plunter = db.query("SELECT punter.* FROM punter WHERE punter_id=? LIMIT 1", [userData.user_id], function(err, rows, fields) {
+    getMaxMarketSummation: async function (userData, callback) {
+        db.query("SELECT sum(stake) as sum_of_max_market FROM single_bet_info WHERE market_status = 0 AND market_type=?", [userData.market_type], function (err, rows, fields) {
+            if (!err) {
+                var responseObject = 0;
+                if (rows.length > 0) {
+                    var responseObject = rows[0].sum_of_max_market;
+                }
+                callback({
+                    success: true,
+                    message: "summation of max market",
+                    result: responseObject
+                })
+            } else {
+                callback({
+                    success: false,
+                    message: "Something went wrong",
+                    result: ''
+                })
+            }
+        })
+    },
+    getbalanceDetails: async function (userData, callback) {
+        var plunter = db.query("SELECT punter.* FROM punter WHERE punter_id=? LIMIT 1", [userData.user_id], function (err, rows, fields) {
 
             if (!err) {
                 // console.log('user data',rows[0]);
@@ -1127,7 +1148,7 @@ var userController = {
     	}
     }
     **/
-    getmatchInplay1: async function(userparams, callback) {
+    getmatchInplay1: async function (userparams, callback) {
 
         var inPlay = [];
         var allEventCompetition = await event_competition(userparams.eventID);
@@ -1163,15 +1184,15 @@ var userController = {
                                         if (bookodd_data[m].inplay == true) {
 
                                             var responseObject = {
-                                                    event_name: competitionName,
-                                                    competetion_id: competitionId,
-                                                    match_id: matcheventID,
-                                                    match_name: matchName,
-                                                    inPlay_data: bookodd_data[m]
+                                                event_name: competitionName,
+                                                competetion_id: competitionId,
+                                                match_id: matcheventID,
+                                                match_name: matchName,
+                                                inPlay_data: bookodd_data[m]
 
-                                                }
-                                                // console.log('market_bookODD inplay data==>',responseObject);
-                                                //inPlay.push(bookodd_data[m])
+                                            }
+                                            // console.log('market_bookODD inplay data==>',responseObject);
+                                            //inPlay.push(bookodd_data[m])
                                             inPlay.push(responseObject)
                                         }
 

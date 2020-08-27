@@ -149,6 +149,11 @@ router.post('/getbalanceDetails', function(req, res) {
         res.json(response);
     })
 })
+router.post('/getMaxMarketSummation', function(req, res) {
+    userModel.getMaxMarketSummation(req.body, function(response) {
+        res.json(response);
+    })
+})
 
 
 router.get("/setting", AuthMiddleware.checkToken, matchController.getSetting);
@@ -163,7 +168,8 @@ router.get("/user-details", AuthMiddleware.checkToken, matchController.getUserCo
 router.post("/transfer-statment", AuthMiddleware.checkToken, matchController.transferStatment);
 router.get("/get-bookmaker/:marketId", AuthMiddleware.checkToken, matchController.getBookmaker);
 router.get("/inplay-match", matchController.inplayMatch);
-router.get("/getmatchInplay", matchController.getmatchInplay);
+router.get("/getmatchInplay", AuthMiddleware.checkToken, matchController.getmatchInplay);
+router.get("/myMarket", AuthMiddleware.checkToken, matchController.myMarket);
 
 
 module.exports = router;
