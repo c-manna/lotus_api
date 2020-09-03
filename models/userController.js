@@ -992,9 +992,9 @@ var userController = {
             }
         }
         let sql = `INSERT INTO single_bet_info 
-               (market_id,market_status, market_type,match_id,selection_id, market_start_time, market_end_time, description, event_name, bet_time, user_id, bet_id, bet_status,exposure,runner_name,stake,odd,placed_odd,last_odd,p_and_l,amount, available_balance, protential_profit,user_ip,settled_time,all_teams_exposure_data,master_id)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
-        var bet_insert = db.query(sql, [betInfo.market_id, betInfo.market_status, betInfo.market_type, betInfo.match_id, betInfo.selection_id, betInfo.market_start_time, betInfo.market_end_time, betInfo.description, betInfo.event_name, betInfo.bet_time, betInfo.user_id, betInfo.bet_id, betInfo.bet_status, betInfo.liability, betInfo.runner_name, betInfo.stake, betInfo.odd, betInfo.place_odd, betInfo.last_odd, betInfo.p_and_l, betInfo.amount, remain_balance, profit, betInfo.user_ip, betInfo.settled_time, JSON.stringify(all_teams_exposure_data), betInfo.master_id], function (err, rows, fields) {
+               (market_id,market_status, market_type,match_id,selection_id, market_start_time, market_end_time, description, event_name, bet_time, user_id, bet_id, bet_status,exposure,runner_name,stake,odd,placed_odd,last_odd,p_and_l,amount, available_balance, protential_profit,user_ip,settled_time,all_teams_exposure_data,master_id,event_id,competition_id)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
+        var bet_insert = db.query(sql, [betInfo.market_id, betInfo.market_status, betInfo.market_type, betInfo.match_id, betInfo.selection_id, betInfo.market_start_time, betInfo.market_end_time, betInfo.description, betInfo.event_name, betInfo.bet_time, betInfo.user_id, betInfo.bet_id, betInfo.bet_status, betInfo.liability, betInfo.runner_name, betInfo.stake, betInfo.odd, betInfo.place_odd, betInfo.last_odd, betInfo.p_and_l, betInfo.amount, remain_balance, profit, betInfo.user_ip, betInfo.settled_time, JSON.stringify(all_teams_exposure_data), betInfo.master_id,betInfo.event_id,betInfo.competition_id], function (err, rows, fields) {
             //console.log('query', bet_insert.sql);
             if (!err) {
                 let net_exposure = check_availableBalance.net_exposure + betInfo.current_exposure;
@@ -1060,37 +1060,6 @@ var userController = {
                     success: false,
                     message: 'Some thing went wrong insert',
                     result: ''
-                })
-            }
-        })
-    },
-    getExposure: async function (userData, callback) {
-        var exposureArr = [];
-        var fetchExposure = db.query("SELECT * FROM single_bet_info WHERE user_id=? AND market_id=? AND market_status=0", [userData.user_id, userData.marketId], function (err, rows, fields) {
-            if (!err) {
-                if (rows.length > 0) {
-                    for (var i = 0; i <= rows.length - 1; i++) {
-                        var responseObject = {
-                            all_teams_exposure_data: JSON.parse(rows[i].all_teams_exposure_data.replace(/(\r\n|\n|\r)/gm, ""))
-                        }
-                        exposureArr.push(responseObject);
-                    }
-                    callback({
-                        success: true,
-                        message: "All bet list data",
-                        result: exposureArr
-                    });
-                } else {
-                    callback({
-                        success: false,
-                        message: "User data not found",
-                        result: exposureArr
-                    });
-                }
-            } else {
-                callback({
-                    success: false,
-                    message: "Some thing went wrong"
                 })
             }
         })
