@@ -207,22 +207,41 @@ function available_balanceInfo(userId) {
 }
 
 function event_managementData(eventID) {
-    return new Promise(function (resolve, reject) {
-        db.query("SELECT * FROM event_management WHERE event=?", [eventID], function (err, rows, fields) {
-            if (err) {
-                reject('Error');
-            } else {
-                if (rows.length > 0) {
-                    resolve(rows);
+    if (eventID == -1) {
+        return new Promise(function (resolve, reject) {
+            db.query("SELECT * FROM event_management WHERE market=?", ['Match Odds'], function (err, rows, fields) {
+                if (err) {
+                    reject('Error');
                 } else {
-                    resolve(rows.length);
+                    if (rows.length > 0) {
+                        resolve(rows);
+                    } else {
+                        resolve(rows.length);
+                    }
+
+
                 }
+            })
 
-
-            }
         })
+    } else {
+        return new Promise(function (resolve, reject) {
+            db.query("SELECT * FROM event_management WHERE event=?", [eventID], function (err, rows, fields) {
+                if (err) {
+                    reject('Error');
+                } else {
+                    if (rows.length > 0) {
+                        resolve(rows);
+                    } else {
+                        resolve(rows.length);
+                    }
 
-    })
+
+                }
+            })
+
+        })
+    }
 }
 
 
@@ -266,10 +285,9 @@ var userController = {
         }
     },
     getEventFetch: async function (userparams, callback) {
-
-
+        // API DATA STOPED 
         var allEventList = await event_list();
-        //console.log('allEventList',allEventList);
+
         var responseList = JSON.parse(allEventList);
         if (responseList.length > 0) {
             db.query("SELECT events.* FROM events", function (err, rows, fields) {
@@ -325,16 +343,40 @@ var userController = {
                 data: []
             })
         }
+        /* db.query("SELECT events.* FROM events", function (err, rows, fields) {
 
+            if (err)
+            {
+                            //console.log('update ==>',rows)
+                       callback({
+                            success: false,
+                            message: "Some error occured",
+                            data: []
+                        });
+            }else
+            {
+                if (rows.length > 0) {
+                    callback({
+                                success: true,
+                                message: "Events added successfully",
+                                //LastID: rows.insertId,
+                                data: JSON.parse(rows[0].event_data.replace(/\\"/g, '"'))
+                            })
+
+                }else{
+                    callback({
+                        success: false,
+                        message: "No Events are there!",
+                        data: []
+                    })
+                }         
+            }
+        }) */
 
     },
     getEventCompetition: async function (userparams, callback) {
-
-
-        //var update_event = await event_status(userparams.eventID);
+        //API STOPED       
         var allEventCompetition = await event_competition(userparams.eventID);
-
-        //console.log('update_event',update_event);
         var responseList = JSON.parse(allEventCompetition);
         if (responseList.length > 0) {
 
@@ -400,12 +442,37 @@ var userController = {
                 data: []
             });
         }
+/*         db.query("SELECT * FROM `competition` WHERE event_id=? LIMIT 1", [userparams.eventID], function (err, rows, fields) {
+            if (err) {
 
+                callback({
+                    success: false,
+                    message: "Some error occured",
+                    data: []
+                });
+            } else {
+                if (rows.length > 0) {
+                    callback({
+                        success: true,
+                        message: "Competition Fetch successfully",
+                        //LastID: rows.insertId,
+                        data: JSON.parse(rows[0].competition_json.replace(/\\"/g, '"'))
+                    })
 
-
-
+                } else {
+                    callback({
+                        success: false,
+                        message: "No Competition are there!",
+                        data: []
+                    })
+                }
+            }
+        }) */
     },
     getmatchBySereis: async function (userparams, callback) {
+
+
+        //API STOPED
 
         var matchByCompetetion = await matchby_Competetion(userparams.eventID, userparams.competitionId);
 
@@ -474,13 +541,44 @@ var userController = {
                 data: []
             });
         }
+
+       
+
+        /* db.query("SELECT matches.* FROM `matches` WHERE event_id=? AND competition_id=? LIMIT 1", [userparams.eventID, userparams.competitionId], function (err, rows, fields) {
+
+            if (err) {
+
+                callback({
+                    success: false,
+                    message: "Some error occured",
+                    data: []
+                });
+            } else {
+
+                if (rows.length > 0) {
+                    callback({
+                        success: true,
+                        message: "Match fetch successfully",
+                        eventID: userparams.eventID,
+                        compID: userparams.competitionId,
+                        data: JSON.parse(rows[0].match_json.replace(/\\"/g, '"'))
+                    })
+                } else {
+                    callback({
+                        success: false,
+                        message: "No data found",
+                        data: []
+                    });
+                }
+            }
+
+
+        }) */
+
     },
-
-
-
-
     getmarketBymatch: async function (userparams, callback) {
 
+        // API STOPED
         var fetchmarketMatch = await market_match(userparams.matcheventID);
 
         var responseList = JSON.parse(fetchmarketMatch);
@@ -547,14 +645,40 @@ var userController = {
                 data: []
             });
         }
+        /* db.query("SELECT market.* FROM `market` WHERE match_event_id=? LIMIT 1", [userparams.matcheventID], function (err, rows, fields) {
+            if (err) {
 
+                callback({
+                    success: false,
+                    message: "Some error occured",
+                    data: []
+                });
+            } else {
 
+                if (rows.length > 0) {
+                    callback({
+                        success: true,
+                        message: "Market fetch successfully",
+                        eventID: userparams.eventID,
+                        compID: userparams.competitionId,
+                        data: JSON.parse(rows[0].market_json.replace(/\\"/g, '"'))
+                    })
+
+                } else {
+                    callback({
+                        success: false,
+                        message: "No data found",
+                        data: []
+                    });
+                }
+            }
+
+        }) */
     },
 
     getmarketByrunner: async function (userparams, callback) {
-
+        // API STOPED 
         var fetch_market_runner = await marketRunner(userparams.marketID);
-
         var responseList = JSON.parse(fetch_market_runner);
 
         if (responseList.length > 0) {
@@ -620,24 +744,53 @@ var userController = {
                 data: []
             });
         }
+        /* db.query("SELECT market_runner.* FROM `market_runner` WHERE market_id=? LIMIT 1", [userparams.marketID], function (err, rows, fields) {
+            if (err) {
+
+                callback({
+                    success: false,
+                    message: "Some error occured",
+                    data: []
+                });
+            } else {
+
+                if (rows.length > 0) {
+                    callback({
+                        success: true,
+                        message: "Market Runner added successfully",
+                        eventID: userparams.eventID,
+                        compID: userparams.competitionId,
+                        data: JSON.parse(rows[0].runner_data.replace(/\\"/g, '"'))
+                    })
+                } else {
+                    callback({
+                        success: false,
+                        message: "No data found",
+                        data: []
+                    });
+                }
 
 
+            }
+        }) */
     },
     getmarketBookOD: async function (userparams, callback) {
+
+        // API STOPED
 
         var market_bookODD = await book_odd(userparams.marketID);
 
         var responseList = JSON.parse(market_bookODD);
-        //console.log('responseList ==>',responseList.length);
+        
         if (responseList.length > 0) {
             db.query("SELECT market_odds.* FROM `market_odds` WHERE market_id=? LIMIT 1", [userparams.marketID], function (err, rows, fields) {
 
-                //console.log("matches",rows.length)
+                
                 if (rows.length > 0) {
 
                     db.query("Update market_odds set market_odd_data=?,event_id=?,competetion_id=? where market_id=?", [market_bookODD, userparams.eventID, userparams.competitionId, userparams.marketID], function (err, rows, fields) {
                         if (err) {
-                            //console.log('update ==>',rows)
+                            
                             callback({
                                 success: false,
                                 message: "Some error occured",
@@ -692,9 +845,38 @@ var userController = {
             });
         }
 
+
+        /* db.query("SELECT market_odds.* FROM `market_odds` WHERE market_id=? LIMIT 1", [userparams.marketID], function (err, rows, fields) {
+            if (err) {
+                callback({
+                    success: false,
+                    message: "Some error occured",
+                    data: []
+                });
+            } else {
+                if (rows.length > 0) {
+                    callback({
+                        success: true,
+                        message: "Market Odds added successfully",
+                        eventID: userparams.eventID,
+                        compID: userparams.competitionId,
+                        data: JSON.parse(rows[0].market_odd_data.replace(/\\"/g, '"'))
+                    })
+                } else {
+                    callback({
+                        success: false,
+                        message: "No data found",
+                        data: []
+                    });
+                }
+            }
+
+        }) */
     },
 
     getmarketBooksession: async function (userparams, callback) {
+
+        // API STOPED
 
         var session_bookData = await marketBooksession(userparams.matchID);
         //console.log('session_bookData = >',session_bookData);
@@ -762,6 +944,33 @@ var userController = {
                 data: []
             });
         }
+
+        /* db.query("SELECT session.* FROM `session` WHERE match_id=? LIMIT 1", [userparams.matchID], function (err, rows, fields) {
+            if (err) {
+                callback({
+                    success: false,
+                    message: "Some error occured",
+                    data: []
+                });
+            } else {
+                if (rows.length > 0) {
+                    callback({
+                        success: true,
+                        message: "Session added successfully",
+                        eventID: userparams.eventID,
+                        compID: userparams.competitionId,
+                        data: JSON.parse(rows[0].session_data.replace(/\\"/g, '"'))
+                    })
+                } else {
+                    callback({
+                        success: false,
+                        message: "No data found",
+                        data: []
+                    });
+                }
+            }
+
+        }) */
 
     },
     getmatchByScore: async function (userparams, callback) {
@@ -937,7 +1146,8 @@ var userController = {
                                                 competetion_id: competitionId,
                                                 match_id: matcheventID,
                                                 match_name: matchName,
-                                                inPlay_data: bookodd_data[m]
+                                                inPlay_data: bookodd_data[m],
+                                                runner_details: fetchmarketMatchData
 
                                             }
                                             // console.log('market_bookODD inplay data==>',responseObject);
@@ -992,10 +1202,10 @@ var userController = {
             }
         }
         let sql = `INSERT INTO single_bet_info 
-               (market_id,market_status, market_type,match_id,selection_id, market_start_time, market_end_time, description, event_name, bet_time, user_id, bet_id, bet_status,exposure,runner_name,stake,odd,placed_odd,last_odd,p_and_l,amount, available_balance, protential_profit,user_ip,settled_time,all_teams_exposure_data,master_id,event_id,competition_id)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
-        var bet_insert = db.query(sql, [betInfo.market_id, betInfo.market_status, betInfo.market_type, betInfo.match_id, betInfo.selection_id, betInfo.market_start_time, betInfo.market_end_time, betInfo.description, betInfo.event_name, betInfo.bet_time, betInfo.user_id, betInfo.bet_id, betInfo.bet_status, betInfo.liability, betInfo.runner_name, betInfo.stake, betInfo.odd, betInfo.place_odd, betInfo.last_odd, betInfo.p_and_l, betInfo.amount, remain_balance, profit, betInfo.user_ip, betInfo.settled_time, JSON.stringify(all_teams_exposure_data), betInfo.master_id,betInfo.event_id,betInfo.competition_id], function (err, rows, fields) {
-            //console.log('query', bet_insert.sql);
+               (market_id,market_status, market_type,match_id,selection_id, market_start_time, market_end_time, description, event_name, user_id, bet_id, bet_status,exposure,runner_name,stake,odd,placed_odd,last_odd,p_and_l,amount, available_balance, protential_profit,user_ip,settled_time,all_teams_exposure_data,master_id,event_id,competition_id)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
+        var bet_insert = db.query(sql, [betInfo.market_id, betInfo.market_status, betInfo.market_type, betInfo.match_id, betInfo.selection_id, betInfo.market_start_time, betInfo.market_end_time, betInfo.description, betInfo.event_name, betInfo.user_id, betInfo.bet_id, betInfo.bet_status, betInfo.liability, betInfo.runner_name, betInfo.stake, betInfo.odd, betInfo.place_odd, betInfo.last_odd, betInfo.p_and_l, betInfo.amount, remain_balance, profit, betInfo.user_ip, betInfo.settled_time, JSON.stringify(all_teams_exposure_data), betInfo.master_id, betInfo.event_id, betInfo.competition_id], function (err, rows, fields) {
+            console.log('query', bet_insert.sql);
             if (!err) {
                 let net_exposure = check_availableBalance.net_exposure + betInfo.current_exposure;
                 var query = db.query("Update punter set net_exposure=?,punter_balance=? where punter_id=?", [net_exposure, remain_balance, betInfo.user_id], function (err, rows, fields) {
@@ -1026,19 +1236,15 @@ var userController = {
     },
     singlePlaceInfoForFancy: async function (betInfo, callback) {
         var check_availableBalance = await available_balanceInfo(betInfo.user_id);
-        var remain_balance = Math.abs(check_availableBalance.punter_balance + check_availableBalance.net_exposure - betInfo.current_exposure);
-
-        var all_teams_exposure_data = [];
-
+        var remain_balance = Math.abs(check_availableBalance.punter_balance - betInfo.current_exposure);
         let sql = `INSERT INTO single_bet_info 
-               (market_id,market_status, market_type,match_id,selection_id, market_start_time, market_end_time, description, event_name, bet_time, user_id, bet_id, bet_status,exposure,runner_name,stake,odd,placed_odd,last_odd,p_and_l,amount, available_balance, protential_profit,user_ip,settled_time,all_teams_exposure_data,master_id,price)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
-        var bet_insert = db.query(sql, [betInfo.market_id, betInfo.market_status, betInfo.market_type, betInfo.match_id, betInfo.selection_id, betInfo.market_start_time, betInfo.market_end_time, betInfo.description, betInfo.event_name, betInfo.bet_time, betInfo.user_id, betInfo.bet_id, betInfo.bet_status, betInfo.liability, betInfo.runner_name, betInfo.stake, betInfo.odd, betInfo.place_odd, betInfo.last_odd, betInfo.p_and_l, betInfo.amount, remain_balance, betInfo.profit, betInfo.user_ip, betInfo.settled_time, betInfo.minValueOfFancy, betInfo.master_id, betInfo.price], function (err, rows, fields) {
+               (market_id,market_status, market_type,match_id,selection_id, market_start_time, market_end_time, description, event_name,  user_id, bet_id, bet_status,exposure,runner_name,stake,odd,placed_odd,last_odd,p_and_l,amount, available_balance, protential_profit,user_ip,settled_time,all_teams_exposure_data,master_id,price,event_id,competition_id)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
+        var bet_insert = db.query(sql, [betInfo.market_id, betInfo.market_status, betInfo.market_type, betInfo.match_id, betInfo.selection_id, betInfo.market_start_time, betInfo.market_end_time, betInfo.description, betInfo.event_name, betInfo.user_id, betInfo.bet_id, betInfo.bet_status, betInfo.liability, betInfo.runner_name, betInfo.stake, betInfo.odd, betInfo.place_odd, betInfo.last_odd, betInfo.p_and_l, betInfo.amount, remain_balance, betInfo.profit, betInfo.user_ip, betInfo.settled_time, betInfo.minValueOfFancy, betInfo.master_id, betInfo.price, betInfo.event_id, betInfo.competition_id], function (err, rows, fields) {
             //console.log('query', bet_insert.sql);
             if (!err) {
-                let update_balance = Math.abs(check_availableBalance.punter_balance + check_availableBalance.net_exposure - betInfo.current_exposure);
                 let net_exposure = check_availableBalance.net_exposure + betInfo.current_exposure;
-                var query = db.query("Update punter set net_exposure=?,punter_balance=? where punter_id=?", [net_exposure, update_balance, betInfo.user_id], function (err, rows, fields) {
+                var query = db.query("Update punter set net_exposure=?,punter_balance=? where punter_id=?", [net_exposure, remain_balance, betInfo.user_id], function (err, rows, fields) {
                     if (!err) {
                         var responseObject = {}
                         callback({
@@ -1060,30 +1266,6 @@ var userController = {
                     success: false,
                     message: 'Some thing went wrong insert',
                     result: ''
-                })
-            }
-        })
-    },
-    getExposureFancy: async function (userData, callback) {
-        var fetchExposure = db.query("SELECT * FROM single_bet_info WHERE user_id=? AND match_id=? AND selection_id=?  AND market_status=0 ORDER BY placed_odd ASC", [userData.user_id, userData.match_id, userData.selection_id], function (err, rows, fields) {
-            if (!err) {
-                if (rows.length > 0) {
-                    callback({
-                        success: true,
-                        message: "All bet list data",
-                        result: rows
-                    });
-                } else {
-                    callback({
-                        success: false,
-                        message: "User data not found",
-                        result: []
-                    });
-                }
-            } else {
-                callback({
-                    success: false,
-                    message: "Some thing went wrong"
                 })
             }
         })
@@ -1145,38 +1327,156 @@ var userController = {
 
         })
     },
+
+    singleBetStatus: async function (userData, callback) {
+        var marketStatus = 0, betStatus = 1;
+
+        var bet_query = db.query("SELECT  `single_bet_info`.`single_bet_id`,`single_bet_info`.`odd`,`single_bet_info`.`placed_odd`,`single_bet_info`.`market_id`,`single_bet_info`.`match_id`,`single_bet_info`.`selection_id`,`single_bet_info`.`competition_id`,`single_bet_info`.`event_id` FROM `single_bet_info` WHERE market_status=? AND bet_status=?", [marketStatus, betStatus], function (err, rows, fields) {
+            if (!err) {
+                //console.log(rows)
+                if (rows.length > 0) {
+                    for (var i = 0; i <= rows.length - 1; i++) {
+                        // console.log('odd value ==>',rows[i]);
+                        //if(rows[i].odd == 0){
+                        //console.log('odd value ==>',rows[i]);
+                        var singleBetId = rows[i].single_bet_id;
+                        var oddValue = rows[i].odd;
+                        var eventID = rows[i].event_id;
+                        var marketID = rows[i].market_id;
+                        var matchID = rows[i].match_id;
+                        var competitionID = rows[i].competition_id;
+                        var selectionID = rows[i].selection_id;
+                        var placedOdd = rows[i].placed_odd;
+                        var inplay_query = db.query("SELECT `in_play`.`inplay_data` FROM `in_play` WHERE `event_id`=?", [eventID], function (err, rows, fields) {
+                            if (!err) {
+                                //console.log('inplay data',rows[0])
+                                if (rows.length > 0) {
+                                    //console.log('inplay data',rows[0].inplay_data)
+                                    var result = JSON.parse(rows[0].inplay_data);
+                                    for (var j = 0; j <= result.length - 1; j++) {
+
+                                        if (result[j].event_id == eventID && result[j].competetion_id == competitionID && result[j].match_id == matchID) {
+                                            //console.log('inplay data',result[j].inPlay_data);
+                                            var inplayRes = result[j].inPlay_data;
+                                            if (inplayRes.marketId == marketID) {
+                                                //console.log('runners 1==>',inplayRes);
+                                                if (inplayRes.runners.length > 0) {
+                                                    var runnersArray = inplayRes.runners;
+                                                    for (k = 0; k <= runnersArray.length - 1; k++) {
+                                                        //console.log('runners 2==>',runnersArray[k].selectionId);
+                                                        //console.log('selectionID 1==>',selectionID);
+                                                        if (runnersArray[k].selectionId == selectionID) {
+                                                            //console.log('runners 3==>',runnersArray[k]);
+                                                            if (oddValue == 0) {
+                                                                //Back
+                                                                //console.log('Back',runnersArray[k].ex);
+                                                                var y = runnersArray[k].ex.availableToBack[1].price;
+                                                                //console.log('placed odd ==>',placedOdd+'<='+y);
+                                                                if (y >= placedOdd) {
+                                                                    betStatus = 0;
+                                                                    //console.log('Back 0',betStatus);
+                                                                    var update_bet = db.query("Update single_bet_info set bet_status=? where single_bet_id=?", [betStatus, singleBetId], function (err, rows, fields) {
+                                                                        if (!err) {
+                                                                            //  callback({success:true,Message:"Back bet status updated with 0"})
+                                                                        } else {
+                                                                            //callback({success:false,message:"Database Error Occured"})
+                                                                        }
+                                                                    })
+                                                                } else {
+                                                                    betStatus = 1;
+                                                                    //console.log('Back 1',betStatus);
+                                                                    var update_bet = db.query("Update single_bet_info set bet_status=? where single_bet_id=?", [betStatus, singleBetId], function (err, rows, fields) {
+                                                                        if (!err) {
+                                                                            //  callback({success:true,Message:"Back bet status updated with 1"})
+                                                                        } else {
+                                                                            //  callback({success:false,message:"Database Error Occured"})
+                                                                        }
+                                                                    })
+                                                                }
+
+                                                            } else {
+                                                                //Lay
+                                                                //console.log('Lay',runnersArray[k].ex);
+                                                                var y = runnersArray[k].ex.availableToLay[1].price;
+                                                                if (y <= placedOdd) {
+                                                                    betStatus = 0;
+                                                                    //console.log('Lay 0',betStatus);
+                                                                    var update_bet = db.query("Update single_bet_info set bet_status=? where single_bet_id=?", [betStatus, singleBetId], function (err, rows, fields) {
+                                                                        if (!err) {
+                                                                            //  callback({success:true,Message:"Lay bet status updated with 0"})
+                                                                        } else {
+                                                                            //  callback({success:false,message:"Database Error Occured"})
+                                                                        }
+                                                                    })
+                                                                } else {
+                                                                    betStatus = 1;
+                                                                    //console.log('Lay 1',betStatus);
+                                                                    var update_bet = db.query("Update single_bet_info set bet_status=? where single_bet_id=?", [betStatus, singleBetId], function (err, rows, fields) {
+                                                                        if (!err) {
+                                                                            //callback({success:true,Message:"Lay bet status updated with 1"})
+                                                                        } else {
+                                                                            //callback({success:false,message:"Database Error Occured"})
+                                                                        }
+                                                                    })
+                                                                }
+                                                            }
+
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            //callback({success:true,result:result[j].inPlay_data})
+                                        }
+                                    }
+                                } else {
+                                    callback({ success: false, message: "No Data Found" });
+                                }
+                            } else {
+                                callback({ success: false, message: "Database Error Occured" })
+                            }
+                        })
+                        //}
+                    }
+                } else {
+                    callback({ success: false, message: "No Data Found" });
+                }
+            } else {
+                callback({ success: false, message: "Database Error Occured" })
+            }
+        })
+    },
     /**
     getmatchInplay:async function(userparams,callback){
 
-    	//console.log('In-play==>',userparams.type)
-    	var competition_array=[];
-    	if(userparams.type == 'all'){
-    		var allEventList = await event_list();
-    		//console.log('allEventList',allEventList);
-    		var event_response = JSON.parse(allEventList);
-    		if(event_response.length >0){
-    			// event_response.forEach(eventElement =>{
-    			for(var i=0;i<=event_response.length-1;i++){
-    				
-    				var eventId=event_response[i].eventType;
-    				var allEventCompetition = await event_competition(event_response[i].eventType);
-    				var eventCompetitiondata = JSON.parse(allEventCompetition);
-    				//console.log('eventElement==>',event_response[i].eventType);
-    				console.log('allEventCompetition',eventId+'='+eventCompetitiondata);
-    				if(eventCompetitiondata.length >0){
-    					for(var j=0;j<=eventCompetitiondata.length-1;i++){
-    						var competitionId=eventCompetitiondata[j].competition.id;
-    						console.log('event competition id==>',competitionId);
-    					}
-    				}
-    				
+        //console.log('In-play==>',userparams.type)
+        var competition_array=[];
+        if(userparams.type == 'all'){
+            var allEventList = await event_list();
+            //console.log('allEventList',allEventList);
+            var event_response = JSON.parse(allEventList);
+            if(event_response.length >0){
+                // event_response.forEach(eventElement =>{
+                for(var i=0;i<=event_response.length-1;i++){
+                	
+                    var eventId=event_response[i].eventType;
+                    var allEventCompetition = await event_competition(event_response[i].eventType);
+                    var eventCompetitiondata = JSON.parse(allEventCompetition);
+                    //console.log('eventElement==>',event_response[i].eventType);
+                    console.log('allEventCompetition',eventId+'='+eventCompetitiondata);
+                    if(eventCompetitiondata.length >0){
+                        for(var j=0;j<=eventCompetitiondata.length-1;i++){
+                            var competitionId=eventCompetitiondata[j].competition.id;
+                            console.log('event competition id==>',competitionId);
+                        }
+                    }
+                	
 
-    				
-    			}//)
-    			//callback({success:true,data:allEventCompetition});
-    		}
+                	
+                }//)
+                //callback({success:true,data:allEventCompetition});
+            }
 
-    	}
+        }
     }
     **/
     getmatchInplay1: async function (userparams, callback) {

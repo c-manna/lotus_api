@@ -140,17 +140,6 @@ router.post("/single-place-bet-for-fancy", function(req, res) {
         res.json(response);
     })
 })
-
-router.post('/getexposure', function(req, res) {
-    userModel.getExposure(req.body, function(response) {
-        res.json(response);
-    })
-})
-router.post('/getExposureFancy', function(req, res) {
-    userModel.getExposureFancy(req.body, function(response) {
-        res.json(response);
-    })
-})
 router.post('/getMaxBetMaxMarket', function(req, res) {
     userModel.getMaxBetMaxMarket(req.body, function(response) {
         res.json(response);
@@ -167,6 +156,13 @@ router.post('/getMaxMarketSummation', function(req, res) {
     })
 })
 
+router.get('/singleBet-status-change',function(req,res){
+    //console.log('singleBet-status-change')
+    userModel.singleBetStatus(req.query,function(response){
+        res.json(response);
+    })
+})
+
 
 router.get("/setting", AuthMiddleware.checkToken, matchController.getSetting);
 router.post("/update-setting", AuthMiddleware.checkToken, matchController.updateSetting);
@@ -178,7 +174,7 @@ router.get("/user-commision", AuthMiddleware.checkToken, matchController.getUser
 
 router.get("/user-details", AuthMiddleware.checkToken, matchController.getUserCommision);
 router.post("/transfer-statment", AuthMiddleware.checkToken, matchController.transferStatment);
-router.get("/get-bookmaker/:marketId", AuthMiddleware.checkToken, matchController.getBookmaker);
+router.get("/get-bookmaker/:eventId/:competitionId/:matchId", AuthMiddleware.checkToken, matchController.getBookmaker);
 router.get("/inplay-match", matchController.inplayMatch);
 router.get("/getmatchInplay", AuthMiddleware.checkToken, matchController.getmatchInplay);
 router.get("/myMarket", AuthMiddleware.checkToken, matchController.myMarket);
