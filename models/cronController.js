@@ -7,6 +7,9 @@ const matchService = require("../services/matchService");
 
 cron.schedule('* * * * *', async() => {
     console.log('running a task every minute');
+
+    /** API STOPED
+
     let inPlay = [];
     try {
         const allEventList = await matchService.event_list();
@@ -41,7 +44,8 @@ cron.schedule('* * * * *', async() => {
                                     competetion_id: competitionId,
                                     match_id: matcheventID,
                                     match_name: matchName,
-                                    inPlay_data: bookodd_data[m]
+                                    inPlay_data: bookodd_data[m],
+                                    runner_details:fetchmarketMatchData
                                 }
                                 const index = eachItem.data.findIndex(item => {
                                     return (item.match_id == responseObject.match_id && item.competetion_id == responseObject.competetion_id)
@@ -63,6 +67,11 @@ cron.schedule('* * * * *', async() => {
     } catch (err) {
         console.log("error==", err);
     }
+
+
+    */
+
+
 });
 
 cron.schedule('* * * * *', async() => {
@@ -91,7 +100,7 @@ cron.schedule('* * * * *', async() => {
                         if (inplayRes.marketId == marketID) {
                             if (inplayRes.runners.length) {
                                 let runnersArray = inplayRes.runners;
-                                for (k = 0; k < runnersArray.length; k++) {
+                                for (let k = 0; k < runnersArray.length; k++) {
                                     let betStatus = 1;
                                     if (runnersArray[k].selectionId == selectionID) {
                                         if (oddValue == 0) {
