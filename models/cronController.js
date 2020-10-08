@@ -8,7 +8,7 @@ const matchService = require("../services/matchService");
 cron.schedule('* * * * *', async() => {
     console.log('running a task every minute');
 
-    /** API STOPED
+    // API STOPED
 
     let inPlay = [];
     try {
@@ -69,7 +69,7 @@ cron.schedule('* * * * *', async() => {
     }
 
 
-    */
+   
 
 
 });
